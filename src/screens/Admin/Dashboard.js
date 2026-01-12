@@ -5,7 +5,7 @@ export default function AdminScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome Admin 👑</Text>
-      <Button title="logout" onPress={() => navigation.navigate('Student')} />
+      
     </View>
   );
 }

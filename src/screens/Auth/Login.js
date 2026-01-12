@@ -1,35 +1,29 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ navigation, route }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // Hardcoded users
-  const adminUser = {
-    username: 'admin',
-    password: '1234',
-  };
+  // Agar SignUp screen se data aaya ho
+  if (route.params?.signupData) {
+    const { username: newUser, password: newPass } = route.params.signupData;
+    if (newUser && newPass) {
+      // autofill login form
+      if (username === '') setUsername(newUser);
+      if (password === '') setPassword(newPass);
+    }
+  }
 
-  const studentUser = {
-    username: 'student',
-    password: '1234',
-  };
+  const adminUser = { username: 'admin', password: '1234' };
+  const studentUser = { username: 'student', password: '1234' };
 
   const handleLogin = () => {
-    if (
-      username === adminUser.username &&
-      password === adminUser.password
-    ) {
+    if (username === adminUser.username && password === adminUser.password) {
       navigation.replace('Admin');
-    } 
-    else if (
-      username === studentUser.username &&
-      password === studentUser.password
-    ) {
-      navigation.replace('Student');
-    } 
-    else {
+    } else if (username === studentUser.username && password === studentUser.password) {
+      navigation.replace('StudentTabs');
+    } else {
       Alert.alert('Error', 'Invalid Username or Password');
     }
   };
@@ -54,6 +48,11 @@ export default function LoginScreen({ navigation }) {
       />
 
       <Button title="Login" onPress={handleLogin} />
+
+      {/* Sign Up link */}
+      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -74,5 +73,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     borderRadius: 5,
+  },
+  signupText: {
+    color: 'blue',
+    marginTop: 15,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
   },
 });
