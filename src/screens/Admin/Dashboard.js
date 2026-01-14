@@ -1,22 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet ,Button} from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import QuestionScreen from './QuestionScreen';
+import StudentScreen from './StudentScreen';
+
+const Tab = createBottomTabNavigator();
 
 export default function AdminScreen({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Welcome Admin 👑</Text>
-      
-    </View>
+  return (  // <-- You must return JSX
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Student" component={StudentScreen} />
+      <Tab.Screen name="Question" component={QuestionScreen} />
+    </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-  },
-});

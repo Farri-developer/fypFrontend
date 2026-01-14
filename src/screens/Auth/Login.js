@@ -1,30 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
+
 export default function LoginScreen({ navigation, route }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Agar SignUp screen se data aaya ho
-  if (route.params?.signupData) {
-    const { username: newUser, password: newPass } = route.params.signupData;
-    if (newUser && newPass) {
-      // autofill login form
-      if (username === '') setUsername(newUser);
-      if (password === '') setPassword(newPass);
+
+
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert('Error', 'Please enter username and password');
+      return;
     }
-  }
 
-  const adminUser = { username: 'admin', password: '1234' };
-  const studentUser = { username: 'student', password: '1234' };
+    setLoading(true);
 
-  const handleLogin = () => {
-    if (username === adminUser.username && password === adminUser.password) {
-      navigation.replace('Admin');
-    } else if (username === studentUser.username && password === studentUser.password) {
-      navigation.replace('StudentTabs');
-    } else {
-      Alert.alert('Error', 'Invalid Username or Password');
+    try {
+      // Change this URL to your Flask server
+      const response = await fetch('http://192.168.100.7:5000/api/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          users: username,
+          passwords: password,
+        }),
+      });
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (response.ok) {
+        // Navigate based on role
+        if (data.role === 'admin') {
+          navigation.replace('Admin');
+        } else if (data.role === 'student') {
+          navigation.replace('StudentTabs');
+        }
+      } else {
+        Alert.alert('Login Failed', data.error || 'Invalid credentials');
+      }
+    } catch (error) {
+
+      setLoading(false);
+      console.error(error);
+      Alert.alert('Error', 'Server not reachable');
     }
   };
 
@@ -47,12 +70,13 @@ export default function LoginScreen({ navigation, route }) {
         onChangeText={setPassword}
       />
 
-      <Button title="Login" onPress={handleLogin} />
+      <Button title={loading ? 'Logging in...' : 'Login'} onPress={handleLogin} disabled={loading} />
 
-      {/* Sign Up link */}
+
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
+
     </View>
   );
 }
