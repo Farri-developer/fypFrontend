@@ -1,82 +1,128 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CheckBox from '@react-native-community/checkbox';
+import { loginUser } from '../../api/loginApi';
 
 export default function LoginScreen({ navigation, route }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Load saved RegNo + Signup RegNo
+  useEffect(() => {
+    const loadSavedUser = async () => {
+      const savedRegNo = await AsyncStorage.getItem('savedRegNo');
+      if (savedRegNo) {
+        setUsername(savedRegNo);
+        setRememberMe(true);
+      }
+    };
 
+    loadSavedUser();
+
+    if (route.params?.signupData?.regNo) {
+      setUsername(route.params.signupData.regNo);
+    }
+  }, [route.params]);
 
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert('Error', 'Please enter username and password');
+      Alert.alert('Error', 'Please enter Reg No and Password');
       return;
     }
 
     setLoading(true);
 
     try {
-    
-      const response = await fetch('http://127.0.0.1:5000/api/admin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          users: username,
-          passwords: password,
-        }),
-      });
+      const data = await loginUser(username, password);
 
-      const data = await response.json();
-      setLoading(false);
-
-      if (response.ok) {
-       
-        if (data.role === 'admin') {
-          navigation.replace('Admin');
-        } else if (data.role === 'student') {
-          navigation.replace('StudentTabs');
-        }
+      // Save / Remove RegNo
+      if (rememberMe) {
+        await AsyncStorage.setItem('savedRegNo', username);
       } else {
-        Alert.alert('Login Failed', data.error || 'Invalid credentials');
+        await AsyncStorage.removeItem('savedRegNo');
+      }
+
+      if (data.role === 'admin') {
+        navigation.replace('Admin');
+      } else if (data.role === 'student') {
+        navigation.replace('StudentTabs');
       }
     } catch (error) {
-
+      Alert.alert('Login Failed', error.message);
+    } finally {
       setLoading(false);
-      console.error(error);
-      Alert.alert('Error', 'Server not reachable');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-
-      <TextInput
-        placeholder="Username"
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-      />
-
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-
-      <Button title={loading ? 'Logging in...' : 'Login'} onPress={handleLogin} disabled={loading} />
-
-
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
+      {/* Form */}
+      <View style={styles.form}>
+        <Image
+          source={require('../../../assets/icons/CodeMide.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+
+        <Text style={styles.title}>Login to continue</Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Reg No</Text>
+          <TextInput
+            placeholder="Enter your Reg No"
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            placeholder="Enter password"
+            style={styles.input}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          {/* Remember Me */}
+          <View style={styles.checkboxRow}>
+            <CheckBox value={rememberMe} onValueChange={setRememberMe} />
+            <Text style={styles.checkboxText}>Remember me</Text>
+          </View>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            style={styles.loginBtn}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.loginText}>
+              {loading ? 'Logging in...' : 'Login'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -84,19 +130,72 @@ export default function LoginScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#48D1E4',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    zIndex: 10,
+  },
+  backText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  form: {
+    flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
+  logo: {
+    width: 220,
+    height: 220,
+    alignSelf: 'center',
+  },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
+    borderColor: '#48D1E4',
+    backgroundColor: '#D9FAFF',
     padding: 10,
-    marginBottom: 15,
     borderRadius: 5,
+    marginBottom: 15,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkboxText: {
+    marginLeft: 8,
+  },
+  loginBtn: {
+    backgroundColor: '#48D1E4',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  loginText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   signupText: {
     color: 'blue',
