@@ -14,14 +14,74 @@ const SignUpScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleRegister = () => {
-    if (!agreeTerms) {
-      alert('Please agree to the terms and privacy policy.');
-      return;
-    }
-    // Send data to API or navigate
-    navigation.navigate('Login', { signupData: { regNo, password } });
+  
+  const handleRegister = async () => {
+  // 1. Check all fields
+  if (!studentName || !regNo || !gender || !semester || !cgpa || !password || !confirmPassword) {
+    alert('Please fill all the fields.');
+    return;
+  }
+
+  // 2. Check password match
+  if (password !== confirmPassword) {
+    alert('Password and Confirm Password do not match.');
+    return;
+  }
+
+   // 3. Check cgpa
+  if (cgpa < 0 || cgpa > 4) {
+    alert('CGPA must be between 0 and 4.');
+    return;
+  }
+
+  
+   // 4. Check semester range
+  if (semester < 1 || semester > 8) {
+    alert('Semester must be between 1 and 8.');
+    return;
+  }
+
+  // 3. Check terms
+  if (!agreeTerms) {
+    alert('Please agree to the terms and privacy policy.');
+    return;
+  }
+
+  // 4. Prepare data
+  const studentData = {
+    regno: regNo,
+    name: studentName,
+    gender: gender,
+    password: password,
+    cgpa: parseFloat(cgpa), // make sure it's a number
+    semester: parseInt(semester), // make sure it's a number
   };
+
+  try {
+    // 5. Send data to API
+    const response = await fetch('http://192.168.100.7:5000/api/student/insert', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studentData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('Registration successful!');
+      // Navigate to login or other screen
+      navigation.navigate('Login', { signupData: { regNo, password } });
+    } else {
+      alert(`Error: ${data.message || 'Something went wrong'}`);
+    }
+  } catch (error) {
+    console.log(error);
+    alert('Failed to register. Please try again.');
+  }
+};
+ 
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ alignItems: 'center' }}>
