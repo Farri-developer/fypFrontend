@@ -1,54 +1,207 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { 
+  View, Text, TextInput, StyleSheet, Image, TouchableOpacity, ScrollView 
+} from 'react-native';
+import CheckBox from '@react-native-community/checkbox'; // or use any checkbox lib
 
-export default function SignUpScreen({ navigation }) {
-  const [username, setUsername] = useState('');
+const SignUpScreen = ({ navigation }) => {
+  const [studentName, setStudentName] = useState('');
+  const [regNo, setRegNo] = useState('');
+  const [gender, setGender] = useState('');
+  const [semester, setSemester] = useState('');
+  const [cgpa, setCgpa] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleSignUp = () => {
-    // Wapas Login screen bhejenge with data
-    navigation.navigate('Login', { signupData: { username, password } });
+  const handleRegister = () => {
+    if (!agreeTerms) {
+      alert('Please agree to the terms and privacy policy.');
+      return;
+    }
+    // Send data to API or navigate
+    navigation.navigate('Login', { signupData: { regNo, password } });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ alignItems: 'center' }}>
+      
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
 
-      <TextInput
-        placeholder="Username"
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
+      {/* Logo */}
+      <Image
+        source={require('../../../assets/icons/CodeMide.png')}
+        style={styles.logo}
+        resizeMode="contain"
       />
 
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      <Text style={styles.title}>Please create a new account</Text>
 
-      <Button title="Sign Up" onPress={handleSignUp} />
-    </View>
+      {/* Form Box */}
+      <View style={styles.box}>
+
+        <Text style={styles.label}>Student Name :</Text>
+        <TextInput
+          placeholder="Enter Your Name"
+          style={styles.input}
+          value={studentName}
+          onChangeText={setStudentName}
+        />
+
+        <Text style={styles.label}>Reg No :</Text>
+        <TextInput
+          placeholder="2022-ARID-3981"
+          style={styles.input}
+          value={regNo}
+          onChangeText={setRegNo}
+        />
+
+        <Text style={styles.label}>Gender :</Text>
+        <View style={styles.genderRow}>
+          <TouchableOpacity onPress={() => setGender('Male')} style={styles.genderOption}>
+            <View style={[styles.radio, gender === 'Male' && styles.radioSelected]} />
+            <Text>Male</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setGender('Female')} style={styles.genderOption}>
+            <View style={[styles.radio, gender === 'Female' && styles.radioSelected]} />
+            <Text>Female</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>Semester :</Text>
+        <TextInput
+          placeholder="1 to 8"
+          style={styles.input}
+          value={semester}
+          onChangeText={setSemester}
+        />
+
+        <Text style={styles.label}>CGPA :</Text>
+        <TextInput
+          placeholder="Enter CGPA"
+          style={styles.input}
+          value={cgpa}
+          onChangeText={setCgpa}
+        />
+
+        <Text style={styles.label}>Password :</Text>
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <Text style={styles.label}>Confirm Password :</Text>
+        <TextInput
+          placeholder="Confirm Password"
+          style={styles.input}
+          secureTextEntry
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+
+        {/* Terms */}
+        <View style={styles.termsRow}>
+          <CheckBox value={agreeTerms} onValueChange={setAgreeTerms} />
+          <Text style={{ marginLeft: 8 }}>Agree the terms of use and privacy policy</Text>
+        </View>
+
+        {/* Register Button */}
+        <TouchableOpacity style={styles.registerBtn} onPress={handleRegister}>
+          <Text style={styles.registerText}>Register</Text>
+        </TouchableOpacity>
+
+      </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
-    justifyContent:'center',
-    padding:20,
+    flex: 1,
+    backgroundColor: '#48D1E4',
   },
-  title:{
-    fontSize:22,
-    textAlign:'center',
-    marginBottom:20,
+  backButton: {
+    alignSelf: 'flex-start',
+    margin: 20,
+    marginTop: 60,
   },
-  input:{
-    borderWidth:1,
-    padding:10,
-    marginBottom:15,
-    borderRadius:5,
+  backText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    marginTop: 10,
+  },
+  title: {
+    fontSize: 20,
+    color: 'white',
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+  box: {
+    width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 30,
+  },
+  label: {
+    fontSize: 16,
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#D9FAFF',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#D9FAFF',
+    color: 'black',
+  },
+  genderRow: {
+    flexDirection: 'row',
+    marginVertical: 5,
+  },
+  genderOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  radio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#48D1E4',
+    marginRight: 5,
+  },
+  radioSelected: {
+    backgroundColor: '#48D1E4',
+  },
+  termsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  registerBtn: {
+    backgroundColor: '#48D1E4',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  registerText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
+
+export default SignUpScreen;

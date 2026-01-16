@@ -18,7 +18,7 @@ export default function LoginScreen({ navigation, route }) {
     setLoading(true);
 
     try {
-      // Change this URL to your Flask server
+    
       const response = await fetch('http://192.168.100.7:5000/api/admin', {
         method: 'POST',
         headers: {
@@ -34,7 +34,7 @@ export default function LoginScreen({ navigation, route }) {
       setLoading(false);
 
       if (response.ok) {
-        // Navigate based on role
+       
         if (data.role === 'admin') {
           navigation.replace('Admin');
         } else if (data.role === 'student') {
