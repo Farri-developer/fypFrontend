@@ -7,8 +7,14 @@ import LoginScreen from './src/screens/Auth/LoginScreen';
 import SignUpScreen from './src/screens/Auth/SignUpScreen';
 import EditQuestion from './src/screens/Admin/QuestionScreen/EditQuestion';
 import ReportQuestion from './src/screens/Admin/QuestionScreen/ReportQuestion';
+import EditStudent from './src/screens/Admin/StudentScreen/EditStudent';
+import StudentReport from './src/screens/Admin/StudentScreen/StudentReport';
+import AddStudent from './src/screens/Admin/StudentScreen/AddStudent';
 import AdminScreen from './src/screens/Admin/AdminTab';
 import StudentTabs from './src/screens/Student/StudentTabs';
+
+
+
 import AddQuestionScreen from './src/screens/Admin/QuestionScreen/AddQuestionScreen';
 import { ScreenStackHeaderLeftView } from 'react-native-screens';
 
@@ -36,9 +42,20 @@ export default function App() {
 
         {/* Admin Screens */}
 
+
+        {/* Admin Question Screen  */}
         <Stack.Screen name="EditQuestion" component={EditQuestion} />
         <Stack.Screen name="ReportQuestion" component={ReportQuestion} />
         <Stack.Screen name="AddQuestion" component={AddQuestionScreen} />
+
+        {/* Admin Student Screen  */}
+        <Stack.Screen name="EditStudent" component={EditStudent} />
+        <Stack.Screen name="StudentReport" component={StudentReport} />
+        <Stack.Screen name="AddStudent" component={AddStudent} />
+       
+
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import {
   View,
   Text,
@@ -8,107 +9,56 @@ import {
   StatusBar,
   FlatList,
 } from 'react-native';
+import { getAllStudents } from '../../api/studentApi';
+import { getAllQuestions } from '../../api/questionApi';
 
 export default function AdminScreen({ navigation }) {
   // Variable to manage
 
-  //Question  Data
+
+  //tab Control
   const [tab, setTab] = useState('questions');
-  const questions = [
-    {
-      id: '1',
-      code: 'Q01',
-      text: 'Write a C++ Program that performs and displays arithmetic operations using both integer and floating-point data types.',
-    },
-    {
-      id: '2',
-      code: 'Q02',
-      text: 'Explain OOP concepts with real-world examples.',
-    },
-    {
-      id: '3',
-      code: 'Q03',
-      text: 'What is the difference between stack and heap memory?',
-    },
-    {
-      id: '4',
-      code: 'Q04',
-      text: 'What is the difference between stack and heap memory?',
-    },
-    {
-      id: '5',
-      code: 'Q05',
-      text: 'Describe the lifecycle of a React component.',
-    },
-    {
-      id: '6',
-      code: 'Q06',
-      text: 'Explain the concept of closures in JavaScript with an example.',
-    },
-    {
-      id: '7',
-      code: 'Q07',
-      text: 'What are the different types of inheritance in OOP?',
-    },
-    {
-      id: '8',
-      code: 'Q08',
-      text: 'How does garbage collection work in programming languages like Java and Python?',
-    },
-    {
-      id: '9',
-      code: 'Q09',
-      text: 'What is the difference between synchronous and asynchronous programming?',
-    },
-    {
-      id: '10',
-      code: 'Q10',
-      text: 'Explain the concept of polymorphism in OOP with examples.',
-    },
-  ];
+
+  //Question  Data
+  const [questions, setQuestions] = useState([]);
+  const [qLoading, setQLoading] = useState(true);
 
   //Student   Data
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const students = [
-    {
-      id: '1',
-      name: 'Farhan Ayub',
-      roll: '2022-ARID-3982',
-      semester: '7 Semester',
-    },
-    {
-      id: '2',
-      name: 'FARMANULLAH',
-      roll: '2025-ARID-0099',
-      semester: '1 Semester',
-    },
-    {
-      id: '3',
-      name: 'Waleed Ahmed Khan',
-      roll: '2022-ARID-3982',
-      semester: '7 Semester',
-    },
-    {
-      id: '4',
-      name: 'Mirza Sohail Baig',
-      roll: '2022-ARID-4056',
-      semester: '7 Semester',
-    },
-    {
-      id: '5',
-      name: 'Hashir Sabir',
-      roll: '2021-ARID-4451',
-      semester: '8 Semester',
-    },
-  ];
+
+
+  // When Screen was  load
+  useEffect(() => {
+    fetchStudents();
+    fetchQuestions();
+  }, []);
+
+
+  //student Api
+  const fetchStudents = async () => {
+    const data = await getAllStudents();
+    setStudents(data);
+    setLoading(false);
+  };
+
+
+  //Question Api
+  const fetchQuestions = async () => {
+  const data = await getAllQuestions();
+  setQuestions(data);
+  setQLoading(false);
+};
+
 
   // Function to render each question item
 
   //questions Function
-  const renderQuestion = ({ item }) => (
+  const renderQuestion = ({ item,index }) => (
     <View style={styles.card}>
-      <Text style={styles.qTitle}>{item.code}:</Text>
-      <Text style={styles.qText}>{item.text}</Text>
+      <Text style={styles.qTitle}>Q{index+1}:</Text>
+      <Text style={styles.qText}>{item.description}</Text>
 
       <View style={styles.btnRow}>
         <TouchableOpacity
@@ -133,15 +83,14 @@ export default function AdminScreen({ navigation }) {
   );
 
   //Student Function
-
   const renderStudent = ({ item }) => (
     <View style={styles.studentCard}>
       <View style={styles.studentLeft}>
         <View style={styles.avatar} />
         <View>
           <Text style={styles.studentName}>{item.name}</Text>
-          <Text style={styles.studentInfo}>{item.roll}</Text>
-          <Text style={styles.studentInfo}>{item.semester}</Text>
+          <Text style={styles.studentInfo}>{item.regno}</Text>
+          <Text style={styles.studentInfo}>Semester {item.semester}</Text>
         </View>
       </View>
 
@@ -185,7 +134,7 @@ export default function AdminScreen({ navigation }) {
           source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
         />
-        <Text style={styles.hello}>Hello Abrar Ahmed!</Text>
+        <Text style={styles.hello}>Wellcome!</Text>
         <Text style={styles.subTitle}>
           Admin Portal ( Student & Question Management )
         </Text>
@@ -228,7 +177,7 @@ export default function AdminScreen({ navigation }) {
         {tab === 'questions' && (
           <FlatList
             data={questions}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.qid.toString()}
             renderItem={renderQuestion}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
@@ -246,7 +195,7 @@ export default function AdminScreen({ navigation }) {
         {tab === 'students' && (
           <FlatList
             data={students}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.sid.toString()}
             renderItem={renderStudent}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
@@ -255,7 +204,7 @@ export default function AdminScreen({ navigation }) {
                 style={styles.addStudentBtn}
                 onPress={() => navigation.navigate('AddStudent')}
               >
-                <Text style={styles.addStudentText}>Add Students</Text>
+                <Text style={styles.addStudentText}>+ Add Students</Text>
               </TouchableOpacity>
             }
           />
@@ -296,7 +245,7 @@ const styles = StyleSheet.create({
   },
 
   hello: {
-    fontSize: 22,
+    fontSize: 26,
     color: '#fff',
     fontWeight: '700',
   },
@@ -383,7 +332,7 @@ const styles = StyleSheet.create({
   },
 
   addQuestionBtn: {
-    backgroundColor: '#48D1E4',
+    backgroundColor: '#eafcff',
     paddingVertical: 12,
     borderRadius: 25,
     marginTop: 15,
@@ -391,17 +340,12 @@ const styles = StyleSheet.create({
   },
 
   addQuestionText: {
-    color: '#fff',
+    color: '#48D1E4',
     fontSize: 16,
     fontWeight: '600',
   },
 
-  studentCard: {
-    backgroundColor: '#48D1E4',
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 10,
-  },
+
 
   studentText: {
     color: '#fff',
@@ -452,6 +396,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 15,
     marginBottom: 5,
+    alignItems: 'center',
   },
 
   studentBtnText: {

@@ -25,3 +25,16 @@ export const registerStudent = async (studentData) => {
 };
 
 
+
+export const getAllStudents = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/student/getall`);
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error('Error fetching students:', error);
+    return [];
+  }
+};
+
+
