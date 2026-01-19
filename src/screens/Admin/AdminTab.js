@@ -10,17 +10,101 @@ import {
 } from 'react-native';
 
 export default function AdminScreen({ navigation }) {
-  const [tab, setTab] = useState('questions');
+  // Variable to manage
 
-  // Unique IDs and clean array
+  //Question  Data
+  const [tab, setTab] = useState('questions');
   const questions = [
-    { id: '1', code: 'Q01', text: 'Write a C++ Program that performs and displays arithmetic operations using both integer and floating-point data types.' },
-    { id: '2', code: 'Q02', text: 'Explain OOP concepts with real-world examples.' },
-    { id: '3', code: 'Q03', text: 'What is the difference between stack and heap memory?' },
-    { id: '4', code: 'Q04', text: 'Describe polymorphism with examples.' },
-    { id: '5', code: 'Q05', text: 'Explain inheritance and encapsulation in OOP.' },
+    {
+      id: '1',
+      code: 'Q01',
+      text: 'Write a C++ Program that performs and displays arithmetic operations using both integer and floating-point data types.',
+    },
+    {
+      id: '2',
+      code: 'Q02',
+      text: 'Explain OOP concepts with real-world examples.',
+    },
+    {
+      id: '3',
+      code: 'Q03',
+      text: 'What is the difference between stack and heap memory?',
+    },
+    {
+      id: '4',
+      code: 'Q04',
+      text: 'What is the difference between stack and heap memory?',
+    },
+    {
+      id: '5',
+      code: 'Q05',
+      text: 'Describe the lifecycle of a React component.',
+    },
+    {
+      id: '6',
+      code: 'Q06',
+      text: 'Explain the concept of closures in JavaScript with an example.',
+    },
+    {
+      id: '7',
+      code: 'Q07',
+      text: 'What are the different types of inheritance in OOP?',
+    },
+    {
+      id: '8',
+      code: 'Q08',
+      text: 'How does garbage collection work in programming languages like Java and Python?',
+    },
+    {
+      id: '9',
+      code: 'Q09',
+      text: 'What is the difference between synchronous and asynchronous programming?',
+    },
+    {
+      id: '10',
+      code: 'Q10',
+      text: 'Explain the concept of polymorphism in OOP with examples.',
+    },
   ];
 
+  //Student   Data
+
+  const students = [
+    {
+      id: '1',
+      name: 'Farhan Ayub',
+      roll: '2022-ARID-3982',
+      semester: '7 Semester',
+    },
+    {
+      id: '2',
+      name: 'FARMANULLAH',
+      roll: '2025-ARID-0099',
+      semester: '1 Semester',
+    },
+    {
+      id: '3',
+      name: 'Waleed Ahmed Khan',
+      roll: '2022-ARID-3982',
+      semester: '7 Semester',
+    },
+    {
+      id: '4',
+      name: 'Mirza Sohail Baig',
+      roll: '2022-ARID-4056',
+      semester: '7 Semester',
+    },
+    {
+      id: '5',
+      name: 'Hashir Sabir',
+      roll: '2021-ARID-4451',
+      semester: '8 Semester',
+    },
+  ];
+
+  // Function to render each question item
+
+  //questions Function
   const renderQuestion = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.qTitle}>{item.code}:</Text>
@@ -29,14 +113,18 @@ export default function AdminScreen({ navigation }) {
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() => navigation.navigate('ReportQuestion', { question: item })}
+          onPress={() =>
+            navigation.navigate('ReportQuestion', { question: item })
+          }
         >
           <Text style={styles.smallBtnText}>Report</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() => navigation.navigate('EditQuestion', { question: item })}
+          onPress={() =>
+            navigation.navigate('EditQuestion', { question: item })
+          }
         >
           <Text style={styles.smallBtnText}>Edit</Text>
         </TouchableOpacity>
@@ -44,81 +132,134 @@ export default function AdminScreen({ navigation }) {
     </View>
   );
 
+  //Student Function
+
+  const renderStudent = ({ item }) => (
+    <View style={styles.studentCard}>
+      <View style={styles.studentLeft}>
+        <View style={styles.avatar} />
+        <View>
+          <Text style={styles.studentName}>{item.name}</Text>
+          <Text style={styles.studentInfo}>{item.roll}</Text>
+          <Text style={styles.studentInfo}>{item.semester}</Text>
+        </View>
+      </View>
+
+      <View style={styles.studentRight}>
+        <TouchableOpacity
+          style={styles.studentBtn}
+          onPress={() =>
+            navigation.navigate('StudentReport', { student: item })
+          }
+        >
+          <Text style={styles.studentBtnText}>View Report</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.studentBtn}
+          onPress={() => navigation.navigate('EditStudent', { student: item })}
+        >
+          <Text style={styles.studentBtnText}>Edit</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  // View Render
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#48D1E4" barStyle="light-content" />
 
       {/* Logout */}
-      <TouchableOpacity style={styles.logoutBtn} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.logoutBtn}
+        onPress={() => navigation.goBack()}
+      >
         <Text style={styles.logoutText}>‹ Logout</Text>
       </TouchableOpacity>
 
       {/* Header */}
-      <View style={styles.headerContainer}>
+      <View style={styles.header}>
         <Image
           source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
-          resizeMode="contain"
         />
         <Text style={styles.hello}>Hello Abrar Ahmed!</Text>
         <Text style={styles.subTitle}>
-          Admin Portal (Student & Question Management)
+          Admin Portal ( Student & Question Management )
         </Text>
+      </View>
 
-        <View style={styles.wholeview}>
-          {/* Tabs */}
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, tab === 'students' && styles.tabActive]}
-              onPress={() => setTab('students')}
+      {/* White Card Area */}
+      <View style={styles.mainCard}>
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, tab === 'students' && styles.tabActive]}
+            onPress={() => setTab('students')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                tab === 'students' && styles.tabTextActive,
+              ]}
             >
-              <Text style={[styles.tabText, tab === 'students' && styles.tabTextActive]}>
-                Students
-              </Text>
-            </TouchableOpacity>
+              Students
+            </Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.tab, tab === 'questions' && styles.tabActive]}
-              onPress={() => setTab('questions')}
+          <TouchableOpacity
+            style={[styles.tab, tab === 'questions' && styles.tabActive]}
+            onPress={() => setTab('questions')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                tab === 'questions' && styles.tabTextActive,
+              ]}
             >
-              <Text style={[styles.tabText, tab === 'questions' && styles.tabTextActive]}>
-                Questions
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Tab Content */}
-          <View style={styles.tabContent}>
-            {/* QUESTIONS TAB */}
-            {tab === 'questions' && (
-              <FlatList
-                data={questions}
-                keyExtractor={item => item.id}
-                renderItem={renderQuestion}
-                contentContainerStyle={{ paddingBottom: 20 }}
-                ListFooterComponent={
-                  <TouchableOpacity
-                    style={styles.addQuestionBtn}
-                    onPress={() => navigation.navigate('AddQuestion')}
-                  >
-                    <Text style={styles.addQuestionText}>+ Add Question</Text>
-                  </TouchableOpacity>
-                }
-              />
-            )}
-
-            {/* STUDENTS TAB */}
-            {tab === 'students' && (
-              <View style={styles.studentWrapper}>
-                {['Ali', 'Ahmed', 'Usman'].map((name, index) => (
-                  <View key={index} style={styles.studentCard}>
-                    <Text style={styles.studentText}>{name}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
+              Questions
+            </Text>
+          </TouchableOpacity>
         </View>
+
+        {/* Content */}
+        {tab === 'questions' && (
+          <FlatList
+            data={questions}
+            keyExtractor={item => item.id}
+            renderItem={renderQuestion}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ListFooterComponent={
+              <TouchableOpacity
+                style={styles.addQuestionBtn}
+                onPress={() => navigation.navigate('AddQuestion')}
+              >
+                <Text style={styles.addQuestionText}>+ Add Question</Text>
+              </TouchableOpacity>
+            }
+          />
+        )}
+
+        {tab === 'students' && (
+          <FlatList
+            data={students}
+            keyExtractor={item => item.id}
+            renderItem={renderStudent}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            ListFooterComponent={
+              <TouchableOpacity
+                style={styles.addStudentBtn}
+                onPress={() => navigation.navigate('AddStudent')}
+              >
+                <Text style={styles.addStudentText}>Add Students</Text>
+              </TouchableOpacity>
+            }
+          />
+        )}
       </View>
     </View>
   );
@@ -143,46 +284,43 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  headerContainer: {
+  header: {
     alignItems: 'center',
-    paddingTop: 100,
-    paddingBottom: 20,
+    marginTop: 90,
   },
 
   logo: {
-    width: 120,
-    height: 120,
+    width: 90,
+    height: 90,
+    marginBottom: 5,
   },
 
   hello: {
     fontSize: 22,
     color: '#fff',
     fontWeight: '700',
-    marginTop: 10,
   },
 
   subTitle: {
     fontSize: 13,
     color: '#eafcff',
+    marginTop: 5,
     textAlign: 'center',
-    marginTop: 4,
   },
 
-  wholeview: {
-    margin: 40,
-    backgroundColor: '#8fe6f2',
-    padding: 10,
-    borderRadius: 20,
+  mainCard: {
     flex: 1,
-    width: '93%',
+    backgroundColor: '#ffffff',
+    margin: 15,
+    borderRadius: 25,
+    padding: 12,
   },
 
   tabContainer: {
     flexDirection: 'row',
-    borderRadius: 40,
-    alignSelf: 'center',
+    backgroundColor: '#e8f7fa',
+    borderRadius: 30,
     padding: 5,
-    marginTop: 20,
   },
 
   tab: {
@@ -206,21 +344,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
 
-  tabContent: {
-    backgroundColor: '#f0f4f8',
-    alignSelf: 'center',
-    borderRadius: 25,
-    padding: 5,
-    flex: 1,
-    width: '100%',
-    marginTop: 20,
-  },
-
   card: {
     backgroundColor: '#48D1E4',
     borderRadius: 15,
     padding: 15,
-    margin: 5,
+    marginTop: 10,
   },
 
   qTitle: {
@@ -237,13 +365,13 @@ const styles = StyleSheet.create({
   btnRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
 
   smallBtn: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingHorizontal: 22,
+    paddingVertical: 6,
     borderRadius: 20,
     marginHorizontal: 5,
   },
@@ -256,22 +384,16 @@ const styles = StyleSheet.create({
 
   addQuestionBtn: {
     backgroundColor: '#48D1E4',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 25,
-    marginHorizontal: 10,
-    marginTop: 10,
+    marginTop: 15,
     alignItems: 'center',
   },
 
   addQuestionText: {
     color: '#fff',
-    fontWeight: '600',
     fontSize: 16,
-  },
-
-  studentWrapper: {
-    marginTop: 30,
-    alignItems: 'center',
+    fontWeight: '600',
   },
 
   studentCard: {
@@ -279,12 +401,76 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     marginBottom: 10,
-    width: '90%',
   },
 
   studentText: {
     color: '#fff',
     fontWeight: '600',
     textAlign: 'center',
+  },
+
+  //student Styles
+
+  studentCard: {
+    backgroundColor: '#48D1E4',
+    borderRadius: 18,
+    padding: 15,
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  studentLeft: {
+    flexDirection: 'row',
+  },
+
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    marginRight: 10,
+  },
+
+  studentName: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+
+  studentInfo: {
+    color: '#eafcff',
+    fontSize: 12,
+  },
+
+  studentRight: {
+    justifyContent: 'space-between',
+  },
+
+  studentBtn: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    marginBottom: 5,
+  },
+
+  studentBtnText: {
+    color: '#48D1E4',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+
+  addStudentBtn: {
+    backgroundColor: '#eafcff',
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+
+  addStudentText: {
+    color: '#48D1E4',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
