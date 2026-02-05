@@ -1,125 +1,177 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  StatusBar,
   FlatList,
+  Alert,
 } from 'react-native';
-import { getAllStudents } from '../../api/studentApi';
-import { getAllQuestions } from '../../api/questionApi';
+import { getAllStudents, deleteStudent } from '../../api/studentApi';
+import { getAllQuestions, deleteQuestion } from '../../api/questionApi';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function AdminScreen({ navigation }) {
-  // Variable to manage
+  // Tab control
+  const [tab, setTab] = useState('students');
 
-
-  //tab Control
-  const [tab, setTab] = useState('questions');
-
-  //Question  Data
+  // Data states
   const [questions, setQuestions] = useState([]);
-  const [qLoading, setQLoading] = useState(true);
-
-  //Student   Data
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [qLoading, setQLoading] = useState(true);
 
-
-
-  // When Screen was  load
-  useEffect(() => {
-    fetchStudents();
-    fetchQuestions();
-  }, []);
-
-
-  //student Api
+  // Fetch students
   const fetchStudents = async () => {
-    const data = await getAllStudents();
-    setStudents(data);
-    setLoading(false);
+    try {
+      const data = await getAllStudents();
+      setStudents(data);
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
   };
 
-
-  //Question Api
+  // Fetch questions
   const fetchQuestions = async () => {
-  const data = await getAllQuestions();
-  setQuestions(data);
-  setQLoading(false);
-};
+    try {
+      const data = await getAllQuestions();
+      setQuestions(data);
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
 
+  // Refresh data whenever screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-  // Function to render each question item
+      const fetchData = async () => {
+        if (isActive) {
+          setLoading(true);
+          setQLoading(true);
+          await fetchStudents();
+          await fetchQuestions();
+          setLoading(false);
+          setQLoading(false);
+        }
+      };
 
-  //questions Function
-  const renderQuestion = ({ item,index }) => (
+      fetchData();
+
+      return () => {
+        isActive = false; // cleanup on blur
+      };
+    }, [])
+  );
+
+  // Delete student
+  const handleDeleteStudent = async sid => {
+    Alert.alert('Delete Student', 'Are you sure you want to delete this student?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteStudent(sid);
+            fetchStudents(); // Refresh after delete
+          } catch (error) {
+            Alert.alert('Error', error.message);
+          }
+        },
+      },
+    ]);
+  };
+
+  // Delete question
+  const handleDeleteQuestion = async qid => {
+    Alert.alert('Delete Question', 'Are you sure you want to delete this question?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteQuestion(qid);
+            fetchQuestions();
+          } catch (error) {
+            Alert.alert('Error', error.message);
+          }
+        },
+      },
+    ]);
+  };
+
+  // Render functions
+  const renderQuestion = ({ item, index }) => (
     <View style={styles.card}>
-      <Text style={styles.qTitle}>Q{index+1}:</Text>
+      <Text style={styles.qTitle}>Q{index + 1}:</Text>
       <Text style={styles.qText}>{item.description}</Text>
-
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() =>
-            navigation.navigate('ReportQuestion', { question: item })
-          }
+          onPress={() => navigation.navigate('ReportQuestion', { question: item })}
         >
           <Text style={styles.smallBtnText}>Report</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() =>
-            navigation.navigate('EditQuestion', { question: item })
-          }
+          onPress={() => navigation.navigate('EditQuestion', { question: item })}
         >
           <Text style={styles.smallBtnText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.smallBtn}
+          onPress={() => handleDeleteQuestion(item.qid)}
+        >
+          <Text style={styles.smallBtnText}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  //Student Function
   const renderStudent = ({ item }) => (
     <View style={styles.studentCard}>
       <View style={styles.studentLeft}>
-        <View style={styles.avatar} />
+        <View style={styles.avatar}>
+          <Image
+            source={require('../../../assets/icons/Profilew.png')}
+            style={{ width: 35, height: 35, marginTop: 3, marginLeft: 2 }}
+          />
+        </View>
         <View>
           <Text style={styles.studentName}>{item.name}</Text>
           <Text style={styles.studentInfo}>{item.regno}</Text>
           <Text style={styles.studentInfo}>Semester {item.semester}</Text>
         </View>
       </View>
-
       <View style={styles.studentRight}>
         <TouchableOpacity
           style={styles.studentBtn}
-          onPress={() =>
-            navigation.navigate('StudentReport', { student: item })
-          }
+          onPress={() => navigation.navigate('StudentReport', { student: item })}
         >
           <Text style={styles.studentBtnText}>View Report</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.studentBtn}
           onPress={() => navigation.navigate('EditStudent', { student: item })}
         >
           <Text style={styles.studentBtnText}>Edit</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.studentBtn}
+          onPress={() => handleDeleteStudent(item.sid)}
+        >
+          <Text style={styles.studentBtnText}>Delete</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 
-  // View Render
-
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#48D1E4" barStyle="light-content" />
-
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutBtn}
@@ -140,7 +192,7 @@ export default function AdminScreen({ navigation }) {
         </Text>
       </View>
 
-      {/* White Card Area */}
+      {/* Main Card */}
       <View style={styles.mainCard}>
         {/* Tabs */}
         <View style={styles.tabContainer}>
@@ -148,26 +200,15 @@ export default function AdminScreen({ navigation }) {
             style={[styles.tab, tab === 'students' && styles.tabActive]}
             onPress={() => setTab('students')}
           >
-            <Text
-              style={[
-                styles.tabText,
-                tab === 'students' && styles.tabTextActive,
-              ]}
-            >
+            <Text style={[styles.tabText, tab === 'students' && styles.tabTextActive]}>
               Students
             </Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={[styles.tab, tab === 'questions' && styles.tabActive]}
             onPress={() => setTab('questions')}
           >
-            <Text
-              style={[
-                styles.tabText,
-                tab === 'questions' && styles.tabTextActive,
-              ]}
-            >
+            <Text style={[styles.tabText, tab === 'questions' && styles.tabTextActive]}>
               Questions
             </Text>
           </TouchableOpacity>
@@ -214,208 +255,37 @@ export default function AdminScreen({ navigation }) {
   );
 }
 
+// Styles (same as before)
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#48D1E4',
-  },
-
-  logoutBtn: {
-    position: 'absolute',
-    top: 55,
-    left: 20,
-    zIndex: 10,
-  },
-
-  logoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-  header: {
-    alignItems: 'center',
-    marginTop: 90,
-  },
-
-  logo: {
-    width: 90,
-    height: 90,
-    marginBottom: 5,
-  },
-
-  hello: {
-    fontSize: 26,
-    color: '#fff',
-    fontWeight: '700',
-  },
-
-  subTitle: {
-    fontSize: 13,
-    color: '#eafcff',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-
-  mainCard: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    margin: 15,
-    borderRadius: 25,
-    padding: 12,
-  },
-
-  tabContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#e8f7fa',
-    borderRadius: 30,
-    padding: 5,
-  },
-
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 25,
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-
-  tabActive: {
-    backgroundColor: '#48D1E4',
-  },
-
-  tabText: {
-    color: '#48D1E4',
-    fontWeight: '600',
-  },
-
-  tabTextActive: {
-    color: '#ffffff',
-  },
-
-  card: {
-    backgroundColor: '#48D1E4',
-    borderRadius: 15,
-    padding: 15,
-    marginTop: 10,
-  },
-
-  qTitle: {
-    color: '#fff',
-    fontWeight: '700',
-    marginBottom: 5,
-  },
-
-  qText: {
-    color: '#eafcff',
-    fontSize: 13,
-  },
-
-  btnRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
-  },
-
-  smallBtn: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 22,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginHorizontal: 5,
-  },
-
-  smallBtnText: {
-    color: '#48D1E4',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  addQuestionBtn: {
-    backgroundColor: '#eafcff',
-    paddingVertical: 12,
-    borderRadius: 25,
-    marginTop: 15,
-    alignItems: 'center',
-  },
-
-  addQuestionText: {
-    color: '#48D1E4',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-
-
-  studentText: {
-    color: '#fff',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-
-  //student Styles
-
-  studentCard: {
-    backgroundColor: '#48D1E4',
-    borderRadius: 18,
-    padding: 15,
-    marginTop: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  studentLeft: {
-    flexDirection: 'row',
-  },
-
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    marginRight: 10,
-  },
-
-  studentName: {
-    color: '#fff',
-    fontWeight: '700',
-  },
-
-  studentInfo: {
-    color: '#eafcff',
-    fontSize: 12,
-  },
-
-  studentRight: {
-    justifyContent: 'space-between',
-  },
-
-  studentBtn: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 15,
-    marginBottom: 5,
-    alignItems: 'center',
-  },
-
-  studentBtnText: {
-    color: '#48D1E4',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-
-  addStudentBtn: {
-    backgroundColor: '#eafcff',
-    paddingVertical: 12,
-    borderRadius: 25,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-
-  addStudentText: {
-    color: '#48D1E4',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: '#48D1E4' },
+  logoutBtn: { margin: 15, alignSelf: 'flex-start' },
+  logoutText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  header: { alignItems: 'center', marginTop: 10 },
+  logo: { width: 90, height: 90, marginBottom: 5 },
+  hello: { fontSize: 26, color: '#fff', fontWeight: '700' },
+  subTitle: { fontSize: 13, color: '#eafcff', marginTop: 5, textAlign: 'center' },
+  mainCard: { flex: 1, backgroundColor: '#ffffff', margin: 15, borderRadius: 25, padding: 12 },
+  tabContainer: { flexDirection: 'row', backgroundColor: '#e8f7fa', borderRadius: 30, padding: 5 },
+  tab: { flex: 1, paddingVertical: 10, borderRadius: 25, alignItems: 'center', backgroundColor: '#ffffff' },
+  tabActive: { backgroundColor: '#48D1E4' },
+  tabText: { color: '#48D1E4', fontWeight: '600' },
+  tabTextActive: { color: '#ffffff' },
+  card: { backgroundColor: '#48D1E4', borderRadius: 15, padding: 15, marginTop: 10 },
+  qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5 },
+  qText: { color: '#eafcff', fontSize: 13 },
+  btnRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
+  smallBtn: { backgroundColor: '#fff', paddingHorizontal: 22, paddingVertical: 6, borderRadius: 20, marginHorizontal: 5 },
+  smallBtnText: { color: '#48D1E4', fontSize: 12, fontWeight: '600' },
+  addQuestionBtn: { backgroundColor: '#eafcff', paddingVertical: 12, borderRadius: 25, marginTop: 15, alignItems: 'center' },
+  addQuestionText: { color: '#48D1E4', fontSize: 16, fontWeight: '600' },
+  studentCard: { backgroundColor: '#48D1E4', borderRadius: 18, padding: 15, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' },
+  studentLeft: { flexDirection: 'row' },
+  avatar: { width: 42, height: 42, borderRadius: 20, backgroundColor: '#48D1E4', marginRight: 12, marginTop: 4 },
+  studentName: { color: '#fff', fontWeight: '700' },
+  studentInfo: { color: '#eafcff', fontSize: 12 },
+  studentRight: { justifyContent: 'space-between' },
+  studentBtn: { backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 15, marginBottom: 5, alignItems: 'center' },
+  studentBtnText: { color: '#48D1E4', fontSize: 11, fontWeight: '600' },
+  addStudentBtn: { backgroundColor: '#eafcff', paddingVertical: 12, borderRadius: 25, marginTop: 20, alignItems: 'center' },
+  addStudentText: { color: '#48D1E4', fontSize: 16, fontWeight: '600' },
 });

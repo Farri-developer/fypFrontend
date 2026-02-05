@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { 
-  View, Text, TextInput, StyleSheet, Image, TouchableOpacity, ScrollView 
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { registerStudent } from '../../api/studentApi';
@@ -17,7 +23,15 @@ const SignUpScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!studentName || !regNo || !gender || !semester || !cgpa || !password || !confirmPassword) {
+    if (
+      !studentName ||
+      !regNo ||
+      !gender ||
+      !semester ||
+      !cgpa ||
+      !password ||
+      !confirmPassword
+    ) {
       alert('Please fill all the fields.');
       return;
     }
@@ -65,15 +79,17 @@ const SignUpScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Back Button fixed at top */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>← Back</Text>
-      </TouchableOpacity>
-
-      
-
       {/* Scrollable content */}
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Back Button fixed at top */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+
         {/* Logo */}
         <Image
           source={require('../../../assets/icons/CodeMide.png')}
@@ -92,6 +108,7 @@ const SignUpScreen = ({ navigation }) => {
             style={styles.input}
             value={studentName}
             onChangeText={setStudentName}
+            placeholderTextColor="black"
           />
 
           {/* Reg No */}
@@ -101,17 +118,34 @@ const SignUpScreen = ({ navigation }) => {
             style={styles.input}
             value={regNo}
             onChangeText={setRegNo}
+            placeholderTextColor="black"
           />
 
           {/* Gender */}
           <Text style={styles.label}>Gender :</Text>
           <View style={styles.genderRow}>
-            <TouchableOpacity onPress={() => setGender('Male')} style={styles.genderOption}>
-              <View style={[styles.radio, gender === 'Male' && styles.radioSelected]} />
+            <TouchableOpacity
+              onPress={() => setGender('Male')}
+              style={styles.genderOption}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  gender === 'Male' && styles.radioSelected,
+                ]}
+              />
               <Text>Male</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setGender('Female')} style={styles.genderOption}>
-              <View style={[styles.radio, gender === 'Female' && styles.radioSelected]} />
+            <TouchableOpacity
+              onPress={() => setGender('Female')}
+              style={styles.genderOption}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  gender === 'Female' && styles.radioSelected,
+                ]}
+              />
               <Text>Female</Text>
             </TouchableOpacity>
           </View>
@@ -123,6 +157,7 @@ const SignUpScreen = ({ navigation }) => {
             style={styles.input}
             value={semester}
             onChangeText={setSemester}
+            placeholderTextColor="black"
           />
 
           {/* CGPA */}
@@ -132,6 +167,7 @@ const SignUpScreen = ({ navigation }) => {
             style={styles.input}
             value={cgpa}
             onChangeText={setCgpa}
+            placeholderTextColor="black"
           />
 
           {/* Password */}
@@ -142,6 +178,7 @@ const SignUpScreen = ({ navigation }) => {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
+            placeholderTextColor="black"
           />
 
           {/* Confirm Password */}
@@ -152,18 +189,32 @@ const SignUpScreen = ({ navigation }) => {
             secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            placeholderTextColor="black"
           />
 
+          
           {/* Terms */}
           <View style={styles.termsRow}>
-            <CheckBox value={agreeTerms} onValueChange={setAgreeTerms} />
-            <Text style={{ marginLeft: 8 }}>Agree the terms of use and privacy policy</Text>
+            <CheckBox
+              value={agreeTerms}
+              onValueChange={setAgreeTerms}
+              tintColors={{ true: '#48D1E4', false: 'gray' }} // 🔹 Checked blue, unchecked gray
+            />
+            <Text style={styles.termsText}>
+             I Agree to Privacy Policy
+            </Text>
           </View>
 
           {/* Register Button */}
           <View style={{ alignItems: 'center' }}>
-            <TouchableOpacity style={styles.registerBtn} onPress={handleRegister} disabled={loading}>
-              <Text style={styles.registerText}>{loading ? 'Registering...' : 'Register'}</Text>
+            <TouchableOpacity
+              style={styles.registerBtn}
+              onPress={handleRegister}
+              disabled={loading}
+            >
+              <Text style={styles.registerText}>
+                {loading ? 'Registering...' : 'Register'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -174,21 +225,18 @@ const SignUpScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#48D1E4',
   },
   backButton: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 10,
+    alignSelf: 'flex-start',
+    margin: 15,
   },
   backText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
   },
   scrollContent: {
-    paddingTop: 100, // leaves space for the fixed back button
     alignItems: 'center',
     paddingBottom: 30,
   },
@@ -247,6 +295,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 10,
+   
   },
   registerBtn: {
     backgroundColor: '#48D1E4',

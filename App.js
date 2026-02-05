@@ -25,6 +25,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+
+
+       
         <Stack.Screen name="Welcome" component={WelcomeScreen}    />
         <Stack.Screen name="Login" component={LoginScreen }    />
         <Stack.Screen
@@ -50,10 +54,8 @@ export default function App() {
 
         {/* Admin Student Screen  */}
         <Stack.Screen name="EditStudent" component={EditStudent} />
-        <Stack.Screen name="StudentReport" component={StudentReport} />
+        <Stack.Screen name="StudentReport" component={StudentReport} />         
         <Stack.Screen name="AddStudent" component={AddStudent} />
-       
-
 
 
       </Stack.Navigator>

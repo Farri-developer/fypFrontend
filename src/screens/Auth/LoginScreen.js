@@ -1,3 +1,4 @@
+// LoginScreen.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -18,6 +19,9 @@ export default function LoginScreen({ navigation, route }) {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 🔹 Password visibility toggle
+  const [showPassword, setShowPassword] = useState(false);
 
   // Load saved RegNo + Signup RegNo
   useEffect(() => {
@@ -69,8 +73,11 @@ export default function LoginScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>← Back</Text>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.backText}>‹ Back</Text>
       </TouchableOpacity>
 
       {/* Form */}
@@ -90,20 +97,35 @@ export default function LoginScreen({ navigation, route }) {
             style={styles.input}
             value={username}
             onChangeText={setUsername}
+            placeholderTextColor="black"
           />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            placeholder="Enter password"
-            style={styles.input}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          {/* 🔹 Password Row with Eye Icon */}
+          <View style={styles.passwordRow}>
+            <TextInput
+              placeholder="Enter password"
+              style={[styles.input, { flex: 1 }]}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor="black"
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Image
+                source={require('../../../assets/icons/eye.png')} // 🔹 Eye icon
+                style={{ width: 24, height: 24, marginLeft: 8 }}
+              />
+            </TouchableOpacity>
+          </View>
 
           {/* Remember Me */}
           <View style={styles.checkboxRow}>
-            <CheckBox value={rememberMe} onValueChange={setRememberMe} />
+            <CheckBox
+              value={rememberMe}
+              onValueChange={setRememberMe}
+              tintColors={{ true: '#48D1E4', false: 'gray' }} // 🔹 Checked=Blue, Unchecked=Gray
+            />
             <Text style={styles.checkboxText}>Remember me</Text>
           </View>
 
@@ -119,7 +141,9 @@ export default function LoginScreen({ navigation, route }) {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-            <Text style={styles.signupText}>Don't have an account? Sign Up</Text>
+            <Text style={styles.signupText}>
+              Don't have an account? Sign Up
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -127,20 +151,20 @@ export default function LoginScreen({ navigation, route }) {
   );
 }
 
+// 🔹 Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
   },
   backButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    zIndex: 10,
+    alignSelf: 'flex-start',
+    margin: 15,
   },
   backText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
   },
   form: {
     flex: 1,
@@ -176,7 +200,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 15,
+
+    color: 'black',
   },
+  passwordRow: { flexDirection: 'row', alignItems: 'center' }, // 🔹 Password + Eye
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',

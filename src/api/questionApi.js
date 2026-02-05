@@ -12,3 +12,23 @@ export const getAllQuestions = async () => {
     return [];
   }
 };
+
+
+
+export const deleteQuestion = async (qid) => {
+  try {
+    const response = await fetch(`${BASE_URL}/question/delete/${qid}`, {
+      method: 'DELETE',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Delete failed');
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
