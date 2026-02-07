@@ -19,6 +19,8 @@ const SignUpScreen = ({ navigation }) => {
   const [cgpa, setCgpa] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -67,7 +69,7 @@ const SignUpScreen = ({ navigation }) => {
 
     try {
       setLoading(true);
-      const data = await registerStudent(studentData);
+      await registerStudent(studentData);
       alert('Registration successful!');
       navigation.navigate('Login', { signupData: { regNo } });
     } catch (error) {
@@ -77,12 +79,35 @@ const SignUpScreen = ({ navigation }) => {
     }
   };
 
+  const PasswordInput = ({
+    value,
+    onChangeText,
+    placeholder,
+    secure,
+    toggleSecure,
+  }) => (
+    <View style={styles.passwordContainer}>
+      <TextInput
+        placeholder={placeholder}
+        style={styles.passwordInput}
+        secureTextEntry={!secure}
+        value={value}
+        onChangeText={onChangeText}
+        placeholderTextColor="black"
+      />
+
+      <TouchableOpacity onPress={toggleSecure}>
+        <Image
+          source={require('../../../assets/icons/eye.png')}
+          style={styles.eyeIcon}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      {/* Scrollable content */}
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Back Button fixed at top */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -90,7 +115,6 @@ const SignUpScreen = ({ navigation }) => {
           <Text style={styles.backText}>‹ Back</Text>
         </TouchableOpacity>
 
-        {/* Logo */}
         <Image
           source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
@@ -99,9 +123,7 @@ const SignUpScreen = ({ navigation }) => {
 
         <Text style={styles.title}>Please create a new account</Text>
 
-        {/* Form Box */}
         <View style={styles.box}>
-          {/* Student Name */}
           <Text style={styles.label}>Student Name :</Text>
           <TextInput
             placeholder="Enter Your Name"
@@ -111,7 +133,6 @@ const SignUpScreen = ({ navigation }) => {
             placeholderTextColor="black"
           />
 
-          {/* Reg No */}
           <Text style={styles.label}>Reg No :</Text>
           <TextInput
             placeholder="2022-ARID-3981"
@@ -121,36 +142,20 @@ const SignUpScreen = ({ navigation }) => {
             placeholderTextColor="black"
           />
 
-          {/* Gender */}
           <Text style={styles.label}>Gender :</Text>
           <View style={styles.genderRow}>
-            <TouchableOpacity
-              onPress={() => setGender('Male')}
-              style={styles.genderOption}
-            >
-              <View
-                style={[
-                  styles.radio,
-                  gender === 'Male' && styles.radioSelected,
-                ]}
-              />
-              <Text>Male</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setGender('Female')}
-              style={styles.genderOption}
-            >
-              <View
-                style={[
-                  styles.radio,
-                  gender === 'Female' && styles.radioSelected,
-                ]}
-              />
-              <Text>Female</Text>
-            </TouchableOpacity>
+            {['Male', 'Female'].map((g) => (
+              <TouchableOpacity
+                key={g}
+                onPress={() => setGender(g)}
+                style={styles.genderOption}
+              >
+                <View style={[styles.radio, gender === g && styles.radioSelected]} />
+                <Text>{g}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
-          {/* Semester */}
           <Text style={styles.label}>Semester :</Text>
           <TextInput
             placeholder="1 to 8"
@@ -158,9 +163,9 @@ const SignUpScreen = ({ navigation }) => {
             value={semester}
             onChangeText={setSemester}
             placeholderTextColor="black"
+            keyboardType="numeric"
           />
 
-          {/* CGPA */}
           <Text style={styles.label}>CGPA :</Text>
           <TextInput
             placeholder="Enter CGPA"
@@ -168,44 +173,36 @@ const SignUpScreen = ({ navigation }) => {
             value={cgpa}
             onChangeText={setCgpa}
             placeholderTextColor="black"
+            keyboardType="decimal-pad"
           />
 
-          {/* Password */}
           <Text style={styles.label}>Password :</Text>
-          <TextInput
-            placeholder="Password"
-            style={styles.input}
-            secureTextEntry
+          <PasswordInput
             value={password}
             onChangeText={setPassword}
-            placeholderTextColor="black"
+            placeholder="Password"
+            secure={showPassword}
+            toggleSecure={() => setShowPassword(!showPassword)}
           />
 
-          {/* Confirm Password */}
           <Text style={styles.label}>Confirm Password :</Text>
-          <TextInput
-            placeholder="Confirm Password"
-            style={styles.input}
-            secureTextEntry
+          <PasswordInput
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            placeholderTextColor="black"
+            placeholder="Confirm Password"
+            secure={showConfirmPassword}
+            toggleSecure={() => setShowConfirmPassword(!showConfirmPassword)}
           />
 
-          
-          {/* Terms */}
           <View style={styles.termsRow}>
             <CheckBox
               value={agreeTerms}
               onValueChange={setAgreeTerms}
-              tintColors={{ true: '#48D1E4', false: 'gray' }} // 🔹 Checked blue, unchecked gray
+              tintColors={{ true: '#48D1E4', false: 'gray' }}
             />
-            <Text style={styles.termsText}>
-             I Agree to Privacy Policy
-            </Text>
+            <Text style={styles.termsText}>I Agree to Privacy Policy</Text>
           </View>
 
-          {/* Register Button */}
           <View style={{ alignItems: 'center' }}>
             <TouchableOpacity
               style={styles.registerBtn}
@@ -224,33 +221,17 @@ const SignUpScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#48D1E4',
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    margin: 15,
-  },
-  backText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingBottom: 30,
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    marginTop: 10,
-  },
-  title: {
-    fontSize: 20,
-    color: 'white',
-    marginVertical: 10,
-    textAlign: 'center',
-  },
+  container: { backgroundColor: '#48D1E4', flex: 1 },
+
+  backButton: { alignSelf: 'flex-start', margin: 15, marginTop: 25 },
+  backText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+
+  scrollContent: { alignItems: 'center', paddingBottom: 30 },
+
+  logo: { width: 150, height: 150, marginTop: 10 },
+
+  title: { fontSize: 20, color: 'white', marginVertical: 10, textAlign: 'center' },
+
   box: {
     width: '90%',
     backgroundColor: 'white',
@@ -258,11 +239,9 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 30,
   },
-  label: {
-    fontSize: 16,
-    marginTop: 10,
-    marginBottom: 5,
-  },
+
+  label: { fontSize: 16, marginTop: 10, marginBottom: 5 },
+
   input: {
     borderWidth: 1,
     borderColor: '#D9FAFF',
@@ -271,15 +250,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9FAFF',
     color: 'black',
   },
-  genderRow: {
-    flexDirection: 'row',
-    marginVertical: 5,
-  },
-  genderOption: {
+
+  passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 20,
+    borderWidth: 1,
+    borderColor: '#D9FAFF',
+    borderRadius: 5,
+    backgroundColor: '#D9FAFF',
+    paddingHorizontal: 10,
   },
+
+  passwordInput: { flex: 1, paddingVertical: 10, color: 'black' },
+
+  eyeIcon: { width: 22, height: 22, tintColor: 'gray' },
+
+  genderRow: { flexDirection: 'row', marginVertical: 5 },
+
+  genderOption: { flexDirection: 'row', alignItems: 'center', marginRight: 20 },
+
   radio: {
     width: 18,
     height: 18,
@@ -288,15 +277,13 @@ const styles = StyleSheet.create({
     borderColor: '#48D1E4',
     marginRight: 5,
   },
-  radioSelected: {
-    backgroundColor: '#48D1E4',
-  },
-  termsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
-   
-  },
+
+  radioSelected: { backgroundColor: '#48D1E4' },
+
+  termsRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 10 },
+
+  termsText: { fontSize: 14 },
+
   registerBtn: {
     backgroundColor: '#48D1E4',
     padding: 12,
@@ -305,10 +292,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '50%',
   },
-  registerText: {
-    color: 'white',
-    fontSize: 16,
-  },
+
+  registerText: { color: 'white', fontSize: 16 },
 });
 
 export default SignUpScreen;

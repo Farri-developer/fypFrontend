@@ -1,123 +1,214 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Image,
+} from 'react-native';
 
-export default function AddQuestion({ navigation, route }) {
+import { getQuestionById, updateQuestion } from '../../../api/questionApi';
+
+export default function EditQuestion({ navigation, route }) {
   const { question } = route.params || {};
-  const [questionText, setQuestionText] = useState(question?.description || '');
-  const [duration, setDuration] = useState(question?.duration?.toString() || '');
+  const questionId = question?.qid;
 
-  const handleSave = () => {
-    if (!questionText || !duration) {
-      Alert.alert('Missing Fields', 'Please fill out both fields.');
+  const [description, setDescription] = useState('');
+  const [duration, setDuration] = useState('');
+  const [level, setLevel] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const levels = ['Hard', 'Medium', 'Low'];
+
+  // 🔹 Load question data
+  useEffect(() => {
+    if (!questionId) return;
+
+    const fetchQuestion = async () => {
+      try {
+        setLoading(true);
+        const data = await getQuestionById(questionId);
+
+        setDescription(data.description || '');
+        setDuration(String(data.duration || ''));
+        setLevel(
+          data.questionlevel
+            ? data.questionlevel.charAt(0).toUpperCase() + data.questionlevel.slice(1)
+            : ''
+        );
+      } catch (error) {
+        Alert.alert('Error', 'Failed to load question');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestion();
+  }, [questionId]);
+
+  // 🔹 Update question
+  const handleUpdate = async () => {
+    if (!description.trim() || !duration || !level) {
+      Alert.alert('Validation Error', 'Please fill all fields');
       return;
     }
 
-    console.log('Saved:', { questionText, duration });
-    navigation.goBack();
+    if (isNaN(duration) || parseInt(duration) <= 0) {
+      Alert.alert('Validation Error', 'Duration must be greater than 0 minutes');
+      return;
+    }
+
+    const updatedData = {
+      description: description.trim(),
+      duration: parseInt(duration),
+      questionlevel: level.toLowerCase(),
+    };
+
+    try {
+      setLoading(true);
+      await updateQuestion(questionId, updatedData);
+
+      Alert.alert('Success', 'Question updated successfully');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Update Failed', error.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const LevelOption = ({ label }) => (
+    <TouchableOpacity onPress={() => setLevel(label)} style={styles.levelOption}>
+      <View style={[styles.radio, level === label && styles.radioSelected]} />
+      <Text>{label}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>‹ Back</Text>
       </TouchableOpacity>
 
-      {/* Header */}
-      <Text style={styles.headerText}>Edit Question</Text>
-
-      {/* Form */}
-      <View style={styles.form}>
-        <Text style={styles.label}>Question Text</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your question"
-          value={questionText}
-          onChangeText={setQuestionText}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Logo */}
+        <Image
+          source={require('../../../../assets/icons/CodeMide.png')}
+          style={styles.logo}
+          resizeMode="contain"
         />
 
-        <Text style={styles.label}>Duration (seconds)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter duration"
-          value={duration}
-          onChangeText={setDuration}
-          keyboardType="numeric"
-        />
-      </View>
+        <Text style={styles.title}>Edit Coding Question</Text>
 
-      {/* Buttons */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-          <Text style={styles.btnText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.backButton]} onPress={() => navigation.goBack()}>
-          <Text style={styles.btnText}>Back</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.box}>
+          {/* Description */}
+          <Text style={styles.label}>Question Description :</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Write coding question here..."
+            placeholderTextColor="black"
+            multiline
+            numberOfLines={6}
+          />
+
+          {/* Duration */}
+          <Text style={styles.label}>Duration (Minutes) :</Text>
+          <TextInput
+            style={styles.input}
+            value={duration}
+            onChangeText={setDuration}
+            keyboardType="numeric"
+            placeholder="Enter duration in minutes"
+            placeholderTextColor="black"
+          />
+
+          {/* Level */}
+          <Text style={styles.label}>Question Level :</Text>
+          <View style={styles.levelRow}>
+            {levels.map((lvl) => (
+              <LevelOption key={lvl} label={lvl} />
+            ))}
+          </View>
+
+          {/* Update Button */}
+          <TouchableOpacity style={styles.updateBtn} onPress={handleUpdate} disabled={loading}>
+            <Text style={styles.updateText}>{loading ? 'Updating...' : 'Update Question'}</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#48D1E4',
-    padding: 20,
-  },
-  backBtn: {
-    position: 'absolute',
-    top: 55,
-    left: 20,
-    zIndex: 10,
-  },
-  backText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  headerText: {
-    marginTop: 80,
-    marginBottom: 20,
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+  container: { flex: 1, backgroundColor: '#48D1E4' },
+
+  backButton: { alignSelf: 'flex-start', margin: 15, marginTop: 25 },
+  backText: { color: 'white', fontSize: 16, fontWeight: '600' },
+
+  scrollContent: { paddingTop: 10, alignItems: 'center', paddingBottom: 30 },
+
+  logo: { width: 150, height: 150, marginTop: 10 },
+
+  title: {
+    fontSize: 20,
+    color: 'white',
+    marginVertical: 10,
     textAlign: 'center',
+    fontWeight: '700',
   },
-  form: {
-    backgroundColor: '#fff',
+
+  box: {
+    width: '90%',
+    backgroundColor: 'white',
     borderRadius: 15,
     padding: 15,
+    marginBottom: 30,
   },
-  label: {
-    fontWeight: '600',
-    marginBottom: 5,
-    color: '#333',
-  },
+
+  label: { fontSize: 16, marginTop: 10, marginBottom: 5 },
+
   input: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D9FAFF',
+    borderRadius: 6,
     padding: 10,
-    marginBottom: 15,
-    fontSize: 14,
+    backgroundColor: '#D9FAFF',
+    color: 'black',
   },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+
+  textArea: {
+    height: 120,
+    textAlignVertical: 'top',
+  },
+
+  levelRow: { flexDirection: 'row', marginVertical: 5 },
+  levelOption: { flexDirection: 'row', alignItems: 'center', marginRight: 20 },
+
+  radio: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#48D1E4',
+    marginRight: 5,
+  },
+
+  radioSelected: { backgroundColor: '#48D1E4' },
+
+  updateBtn: {
+    backgroundColor: '#48D1E4',
+    padding: 12,
+    borderRadius: 8,
     marginTop: 20,
+    alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#006994',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  backButton: {
-    backgroundColor: '#555',
-  },
-  btnText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-  },
+
+  updateText: { color: 'white', fontSize: 16, fontWeight: '700' },
 });

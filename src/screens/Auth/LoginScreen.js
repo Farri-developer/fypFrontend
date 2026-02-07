@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
   backButton: {
     alignSelf: 'flex-start',
     margin: 15,
+    marginTop: 25,
   },
   backText: {
     color: '#fff',

@@ -107,8 +107,9 @@ export default function AdminScreen({ navigation }) {
   // Render functions
   const renderQuestion = ({ item, index }) => (
     <View style={styles.card}>
-      <Text style={styles.qTitle}>Q{index + 1}:</Text>
-      <Text style={styles.qText}>{item.description}</Text>
+      <Text style={styles.qTitle}>Q{index + 1}: {item.description} </Text>
+      <Text style={styles.qText}>Level: {item.questionlevel}</Text>
+
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.smallBtn}
@@ -138,13 +139,16 @@ export default function AdminScreen({ navigation }) {
         <View style={styles.avatar}>
           <Image
             source={require('../../../assets/icons/Profilew.png')}
-            style={{ width: 35, height: 35, marginTop: 3, marginLeft: 2 }}
+            style={{ width: 35, height: 35, marginTop: 10, marginLeft: 2 }}
           />
         </View>
         <View>
           <Text style={styles.studentName}>{item.name}</Text>
           <Text style={styles.studentInfo}>{item.regno}</Text>
           <Text style={styles.studentInfo}>Semester {item.semester}</Text>
+          <Text style={styles.studentInfo}>CGPA {item.cgpa}</Text>
+          
+          
         </View>
       </View>
       <View style={styles.studentRight}>
@@ -258,7 +262,7 @@ export default function AdminScreen({ navigation }) {
 // Styles (same as before)
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#48D1E4' },
-  logoutBtn: { margin: 15, alignSelf: 'flex-start' },
+  logoutBtn: { margin: 15, alignSelf: 'flex-start', marginTop: 25 },
   logoutText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   header: { alignItems: 'center', marginTop: 10 },
   logo: { width: 90, height: 90, marginBottom: 5 },
@@ -271,18 +275,18 @@ const styles = StyleSheet.create({
   tabText: { color: '#48D1E4', fontWeight: '600' },
   tabTextActive: { color: '#ffffff' },
   card: { backgroundColor: '#48D1E4', borderRadius: 15, padding: 15, marginTop: 10 },
-  qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5 },
-  qText: { color: '#eafcff', fontSize: 13 },
+  qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5  ,fontSize: 15 },
+  qText: { color: '#eafcff', fontSize: 14,fontWeight: '600' },
   btnRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
   smallBtn: { backgroundColor: '#fff', paddingHorizontal: 22, paddingVertical: 6, borderRadius: 20, marginHorizontal: 5 },
   smallBtnText: { color: '#48D1E4', fontSize: 12, fontWeight: '600' },
   addQuestionBtn: { backgroundColor: '#eafcff', paddingVertical: 12, borderRadius: 25, marginTop: 15, alignItems: 'center' },
   addQuestionText: { color: '#48D1E4', fontSize: 16, fontWeight: '600' },
-  studentCard: { backgroundColor: '#48D1E4', borderRadius: 18, padding: 15, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' },
+  studentCard: { backgroundColor: '#48D1E4', borderRadius: 18, padding: 8, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' },
   studentLeft: { flexDirection: 'row' },
   avatar: { width: 42, height: 42, borderRadius: 20, backgroundColor: '#48D1E4', marginRight: 12, marginTop: 4 },
-  studentName: { color: '#fff', fontWeight: '700' },
-  studentInfo: { color: '#eafcff', fontSize: 12 },
+  studentName: { color: '#fff', fontWeight: '700'  ,fontSize: 16 },
+  studentInfo: { color: '#eafcff', fontSize: 14 },
   studentRight: { justifyContent: 'space-between' },
   studentBtn: { backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 15, marginBottom: 5, alignItems: 'center' },
   studentBtnText: { color: '#48D1E4', fontSize: 11, fontWeight: '600' },
