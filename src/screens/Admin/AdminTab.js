@@ -63,63 +63,80 @@ export default function AdminScreen({ navigation }) {
       return () => {
         isActive = false; // cleanup on blur
       };
-    }, [])
+    }, []),
   );
 
   // Delete student
   const handleDeleteStudent = async sid => {
-    Alert.alert('Delete Student', 'Are you sure you want to delete this student?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteStudent(sid);
-            fetchStudents(); // Refresh after delete
-          } catch (error) {
-            Alert.alert('Error', error.message);
-          }
+    Alert.alert(
+      'Delete Student',
+      'Are you sure you want to delete this student?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteStudent(sid);
+              fetchStudents(); // Refresh after delete
+            } catch (error) {
+              Alert.alert('Error', error.message);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   // Delete question
   const handleDeleteQuestion = async qid => {
-    Alert.alert('Delete Question', 'Are you sure you want to delete this question?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteQuestion(qid);
-            fetchQuestions();
-          } catch (error) {
-            Alert.alert('Error', error.message);
-          }
+    Alert.alert(
+      'Delete Question',
+      'Are you sure you want to delete this question?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteQuestion(qid);
+              fetchQuestions();
+            } catch (error) {
+              Alert.alert('Error', error.message);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   // Render functions
   const renderQuestion = ({ item, index }) => (
     <View style={styles.card}>
-      <Text style={styles.qTitle}>Q{index + 1}: {item.description} </Text>
-      <Text style={styles.qText}>Level: {item.questionlevel}</Text>
+      <Text style={styles.qTitle}>
+        Q{index + 1}: {item.description}{' '}
+      </Text>
 
+      <View style={{ flexDirection: 'row' ,paddingLeft: 5}}>
+        <Text style={styles.qText}>Level: {item.questionlevel} |</Text>
+        <Text style={styles.qText}>Total Attempts: {item.count} </Text>
+      </View>
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() => navigation.navigate('ReportQuestion', { question: item })}
+          onPress={() =>
+            navigation.navigate('ReportQuestion', { question: item })
+          }
         >
           <Text style={styles.smallBtnText}>Report</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.smallBtn}
-          onPress={() => navigation.navigate('EditQuestion', { question: item })}
+          onPress={() =>
+            navigation.navigate('EditQuestion', { question: item })
+          }
         >
           <Text style={styles.smallBtnText}>Edit</Text>
         </TouchableOpacity>
@@ -147,16 +164,16 @@ export default function AdminScreen({ navigation }) {
           <Text style={styles.studentInfo}>{item.regno}</Text>
           <Text style={styles.studentInfo}>Semester {item.semester}</Text>
           <Text style={styles.studentInfo}>CGPA {item.cgpa}</Text>
-          
-          
         </View>
       </View>
       <View style={styles.studentRight}>
         <TouchableOpacity
           style={styles.studentBtn}
-          onPress={() => navigation.navigate('StudentReport', { student: item })}
+          onPress={() =>
+            navigation.navigate('StudentSession', { student: item })
+          }
         >
-          <Text style={styles.studentBtnText}>View Report</Text>
+          <Text style={styles.studentBtnText}>All Session</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.studentBtn}
@@ -164,7 +181,7 @@ export default function AdminScreen({ navigation }) {
         >
           <Text style={styles.studentBtnText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        <TouchableOpacity 
           style={styles.studentBtn}
           onPress={() => handleDeleteStudent(item.sid)}
         >
@@ -204,7 +221,12 @@ export default function AdminScreen({ navigation }) {
             style={[styles.tab, tab === 'students' && styles.tabActive]}
             onPress={() => setTab('students')}
           >
-            <Text style={[styles.tabText, tab === 'students' && styles.tabTextActive]}>
+            <Text
+              style={[
+                styles.tabText,
+                tab === 'students' && styles.tabTextActive,
+              ]}
+            >
               Students
             </Text>
           </TouchableOpacity>
@@ -212,7 +234,12 @@ export default function AdminScreen({ navigation }) {
             style={[styles.tab, tab === 'questions' && styles.tabActive]}
             onPress={() => setTab('questions')}
           >
-            <Text style={[styles.tabText, tab === 'questions' && styles.tabTextActive]}>
+            <Text
+              style={[
+                styles.tabText,
+                tab === 'questions' && styles.tabTextActive,
+              ]}
+            >
               Questions
             </Text>
           </TouchableOpacity>
@@ -267,29 +294,95 @@ const styles = StyleSheet.create({
   header: { alignItems: 'center', marginTop: 10 },
   logo: { width: 90, height: 90, marginBottom: 5 },
   hello: { fontSize: 26, color: '#fff', fontWeight: '700' },
-  subTitle: { fontSize: 13, color: '#eafcff', marginTop: 5, textAlign: 'center' },
-  mainCard: { flex: 1, backgroundColor: '#ffffff', margin: 15, borderRadius: 25, padding: 12 },
-  tabContainer: { flexDirection: 'row', backgroundColor: '#e8f7fa', borderRadius: 30, padding: 5 },
-  tab: { flex: 1, paddingVertical: 10, borderRadius: 25, alignItems: 'center', backgroundColor: '#ffffff' },
+  subTitle: {
+    fontSize: 13,
+    color: '#eafcff',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  mainCard: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    margin: 15,
+    borderRadius: 25,
+    padding: 12,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#e8f7fa',
+    borderRadius: 30,
+    padding: 5,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 25,
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+  },
   tabActive: { backgroundColor: '#48D1E4' },
   tabText: { color: '#48D1E4', fontWeight: '600' },
   tabTextActive: { color: '#ffffff' },
-  card: { backgroundColor: '#48D1E4', borderRadius: 15, padding: 15, marginTop: 10 },
-  qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5  ,fontSize: 15 },
-  qText: { color: '#eafcff', fontSize: 14,fontWeight: '600' },
+  card: {
+    backgroundColor: '#48D1E4',
+    borderRadius: 15,
+    padding: 15,
+    marginTop: 10,
+  },
+  qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5, fontSize: 15 },
+  qText: { color: '#eafcff', fontSize: 14, fontWeight: '600' ,paddingLeft: 10},
   btnRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
-  smallBtn: { backgroundColor: '#fff', paddingHorizontal: 22, paddingVertical: 6, borderRadius: 20, marginHorizontal: 5 },
+  smallBtn: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 22,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginHorizontal: 5,
+  },
   smallBtnText: { color: '#48D1E4', fontSize: 12, fontWeight: '600' },
-  addQuestionBtn: { backgroundColor: '#eafcff', paddingVertical: 12, borderRadius: 25, marginTop: 15, alignItems: 'center' },
+  addQuestionBtn: {
+    backgroundColor: '#eafcff',
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginTop: 15,
+    alignItems: 'center',
+  },
   addQuestionText: { color: '#48D1E4', fontSize: 16, fontWeight: '600' },
-  studentCard: { backgroundColor: '#48D1E4', borderRadius: 18, padding: 8, marginTop: 12, flexDirection: 'row', justifyContent: 'space-between' },
+  studentCard: {
+    backgroundColor: '#48D1E4',
+    borderRadius: 18,
+    padding: 8,
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   studentLeft: { flexDirection: 'row' },
-  avatar: { width: 42, height: 42, borderRadius: 20, backgroundColor: '#48D1E4', marginRight: 12, marginTop: 4 },
-  studentName: { color: '#fff', fontWeight: '700'  ,fontSize: 16 },
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 20,
+    backgroundColor: '#48D1E4',
+    marginRight: 12,
+    marginTop: 4,
+  },
+  studentName: { color: '#fff', fontWeight: '700', fontSize: 16 },
   studentInfo: { color: '#eafcff', fontSize: 14 },
   studentRight: { justifyContent: 'space-between' },
-  studentBtn: { backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 15, marginBottom: 5, alignItems: 'center' },
+  studentBtn: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    marginBottom: 5,
+    alignItems: 'center',
+  },
   studentBtnText: { color: '#48D1E4', fontSize: 11, fontWeight: '600' },
-  addStudentBtn: { backgroundColor: '#eafcff', paddingVertical: 12, borderRadius: 25, marginTop: 20, alignItems: 'center' },
+  addStudentBtn: {
+    backgroundColor: '#eafcff',
+    paddingVertical: 12,
+    borderRadius: 25,
+    marginTop: 20,
+    alignItems: 'center',
+  },
   addStudentText: { color: '#48D1E4', fontSize: 16, fontWeight: '600' },
 });

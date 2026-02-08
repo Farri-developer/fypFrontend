@@ -8,7 +8,7 @@ import SignUpScreen from './src/screens/Auth/SignUpScreen';
 import EditQuestion from './src/screens/Admin/QuestionScreen/EditQuestion';
 import ReportQuestion from './src/screens/Admin/QuestionScreen/ReportQuestion';
 import EditStudent from './src/screens/Admin/StudentScreen/EditStudent';
-import StudentReport from './src/screens/Admin/StudentScreen/StudentReport';
+import StudentSession from './src/screens/Admin/StudentScreen/StudentSession';
 import AddStudent from './src/screens/Admin/StudentScreen/AddStudent';
 import AdminScreen from './src/screens/Admin/AdminTab';
 import StudentTabs from './src/screens/Student/StudentTabs';
@@ -54,7 +54,7 @@ export default function App() {
 
         {/* Admin Student Screen  */}
         <Stack.Screen name="EditStudent" component={EditStudent} />
-        <Stack.Screen name="StudentReport" component={StudentReport} />         
+        <Stack.Screen name="StudentSession" component={StudentSession} />         
         <Stack.Screen name="AddStudent" component={AddStudent} />
 
 

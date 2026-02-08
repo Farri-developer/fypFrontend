@@ -61,7 +61,7 @@ export default function LoginScreen({ navigation, route }) {
       if (data.role === 'admin') {
         navigation.replace('Admin');
       } else if (data.role === 'student') {
-        navigation.replace('StudentTabs');
+        navigation.replace('StudentTabs', { sid: data.sid });
       }
     } catch (error) {
       Alert.alert('Login Failed', error.message);
