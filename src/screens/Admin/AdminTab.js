@@ -207,7 +207,7 @@ export default function AdminScreen({ navigation }) {
           source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
         />
-        <Text style={styles.hello}>Wellcome!</Text>
+        <Text style={styles.hello}>Welcome!</Text>
         <Text style={styles.subTitle}>
           Admin Portal ( Student & Question Management )
         </Text>

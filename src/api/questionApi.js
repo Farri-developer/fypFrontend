@@ -26,7 +26,7 @@ export const deleteQuestion = async (qid) => {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || 'Delete failed');
+      throw new Error(data.message || 'Failed to delete question because it is used in some quiz');
     }
 
     return data;
@@ -89,3 +89,22 @@ export const updateQuestion = async (qid, updatedData) => {
   return data;
 };
 
+
+
+// GET QUESTION REPORT
+export const getQuestionReport = async (qid) => {
+  try {
+    const response = await fetch(`${BASE_URL}/report/qus_rep_admin/${qid}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch report");
+    }
+
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching question report:", error);
+    throw error;
+  }
+};
