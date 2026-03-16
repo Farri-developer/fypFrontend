@@ -1,44 +1,242 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 
-export default function StudentReport({ navigation, route }) {
-  // You can access the student passed from navigation
+import { getAllSessions } from '../../../api/reportApi';
+
+export default function StudentSession({ navigation, route }) {
   const { student } = route.params || {};
+  const studentId = student?.sid;
+
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (studentId) {
+      fetchSessions();
+    }
+  }, []);
+
+  const fetchSessions = async () => {
+    try {
+      const data = await getAllSessions(studentId);
+      setSessions(data || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Editing Student</Text>
-      {student && (
-        <>
-          <Text style={styles.code}>{student.code}</Text>
-          <Text style={styles.text}>{student.text}</Text>
-        </>
-      )}
-    </View>
+
+    
+    <ScrollView style={styles.container}>
+
+      {/* Header Section */}
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {/* Back Button */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+
+        {/* Logo */}
+        <Image
+          source={require('../../../../assets/icons/CodeMide.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      
+      {/* MAIN CARD */}
+      <View style={styles.mainCard}>
+        <Text style={styles.heading}>Session History:</Text>
+        <Text style={styles.subHeading}>All Sessions</Text>
+
+        {sessions.map(item => (
+          <View key={item.sessionId} style={styles.sessionCard}>
+            <Text style={styles.date}>Date: {item.date ?? 'No Date'}</Text>
+
+            <View style={styles.metricsRow}>
+              {/* Blood Pressure */}
+              <View style={styles.metricBox}>
+                <Image
+                  source={require('../../../../assets/icons/Cuff Icon.jpg')}
+                  style={styles.icon}
+                />
+                <Text style={styles.metricTitle}>Blood Pressure</Text>
+                <Text style={styles.metricValue}>
+                  {item.afterQuestionBP ?? '--'}
+                </Text>
+              </View>
+
+              {/* Heart Rate */}
+              <View style={styles.metricBox}>
+                <Image
+                  source={require('../../../../assets/icons/Heart Icon.png')}
+                  style={styles.icon}
+                />
+                <Text style={styles.metricTitle}>Heart Rate</Text>
+                <Text style={styles.metricValue}>
+                  {item.heartRate ?? '--'} bpm
+                </Text>
+              </View>
+
+              {/* HRV */}
+              <View style={styles.metricBox}>
+                <Image
+                  source={require('../../../../assets/icons/heart.png')}
+                  style={styles.icon}
+                />
+                <Text style={styles.metricTitle}>HRV</Text>
+                <Text style={styles.metricValue}>{item.sdnn ?? '--'} ms</Text>
+              </View>
+            </View>
+
+            <Text style={styles.stress}>
+              Overall Stress Level: {item.stressLevel ?? 'Unknown'}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+    
+          {/* Bottom spacing */}
+          <View style={{ height: 40 }} />
+
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#59C6D8',
+    padding: 15,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 15,
-    color: '#48D1E4',
+
+  // Back button style
+  backButton: {
+    alignSelf: 'flex-start',
+    margin: 5,
+    marginTop: 20,
   },
-  code: {
-    fontSize: 18,
+
+  backText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: '600',
-    marginBottom: 5,
   },
-  text: {
+
+  // Logo style
+  logo: {
+    height:75,
+    width: 120,
+    marginLeft: 52,
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  header: {
+    marginBottom: 10,
+  },
+
+  back: {
+    color: '#fff',
     fontSize: 16,
   },
+
+  mainCard: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 5
+  },
+
+  heading: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2BA6B3',
+  },
+
+  subHeading: {
+    color: '#777',
+    marginBottom: 10,
+  },
+
+  sessionCard: {
+    backgroundColor: '#CBEAF0',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+  },
+
+  date: {
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+
+  metricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    
+    
+  },
+
+  metricBox: {
+    alignItems: 'center',
+    backgroundColor: '#4EB9C6',
+    padding: 5,
+    margin: 2,
+    borderRadius: 10,
+    width: '33%',
+  },
+
+  metricTitle: {
+    color: '#fff',
+    fontSize: 11,
+  },
+
+  metricValue: {
+    color: '#fff',
+    fontWeight: 'bold',
+    marginTop: 2,
+    marginBottom: 4
+  },
+  icon:{
+  width:30,
+  height:30,
+  marginBottom:4,
+  marginTop: 4
+},
+
+  
+
+  stress: {
+    textAlign: 'center',
+    marginTop: 8,
+    fontSize: 12,
+  },
 });
-
-
-

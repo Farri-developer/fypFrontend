@@ -9,7 +9,7 @@ import {
   Image
 } from "react-native";
 
-import { getQuestionReport } from "../../../api/questionApi"; // API import
+import { getQuestionReport } from "../../../api/reportApi"; // API import
 
 export default function ReportQuestion({ navigation, route }) {
 
@@ -182,10 +182,10 @@ const styles = StyleSheet.create({
   },
 
   // Logo style
-  logo: {
-    height: 85,
+   logo: {
+    height:75,
     width: 120,
-    marginLeft: 4
+    marginLeft: 52,
   },
 
   // Main container
