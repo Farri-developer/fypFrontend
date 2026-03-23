@@ -12,12 +12,11 @@ import StudentSession from './src/screens/Admin/StudentScreen/StudentSession';
 import AddStudent from './src/screens/Admin/StudentScreen/AddStudent';
 import AdminScreen from './src/screens/Admin/AdminTab';
 import StudentTabs from './src/screens/Student/StudentTabs';
-
-
+import StudentSessionReport from './src/screens/Admin/StudentScreen/StudentSessionReport';
+import StudentQuestionReport from './src/screens/Admin/StudentScreen/StudentQuestionReport';
 
 import AddQuestionScreen from './src/screens/Admin/QuestionScreen/AddQuestionScreen';
 import { ScreenStackHeaderLeftView } from 'react-native-screens';
-
 
 const Stack = createNativeStackNavigator();
 
@@ -25,27 +24,19 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-
-
-
-       
-        <Stack.Screen name="Welcome" component={WelcomeScreen}    />
-        <Stack.Screen name="Login" component={LoginScreen }    />
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
-          options={{headerShown:false}}
+          options={{ headerShown: false }}
         />
 
- 
-
-          {/* auth screens */}
+        {/* auth screens */}
         <Stack.Screen name="Admin" component={AdminScreen} />
         <Stack.Screen name="StudentTabs" component={StudentTabs} />
 
-
         {/* Admin Screens */}
-
 
         {/* Admin Question Screen  */}
         <Stack.Screen name="EditQuestion" component={EditQuestion} />
@@ -54,9 +45,21 @@ export default function App() {
 
         {/* Admin Student Screen  */}
         <Stack.Screen name="EditStudent" component={EditStudent} />
-        <Stack.Screen name="StudentSession" component={StudentSession} />         
         <Stack.Screen name="AddStudent" component={AddStudent} />
 
+        {/* Admin Student Sessions Screen  */}
+        <Stack.Screen name="StudentSession" component={StudentSession} />
+
+        <Stack.Screen
+          name="StudentSessionReport"
+          component={StudentSessionReport}
+
+        />
+
+        {/* <Stack.Screen
+          name="StudentQuestionReport"
+          component={StudentQuestionReport}
+        /> */}
 
       </Stack.Navigator>
     </NavigationContainer>

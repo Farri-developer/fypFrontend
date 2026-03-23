@@ -44,13 +44,9 @@ export default function StudentSession({ navigation, route }) {
   }
 
   return (
-
-    
     <ScrollView style={styles.container}>
-
-      {/* Header Section */}
+      {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -58,7 +54,6 @@ export default function StudentSession({ navigation, route }) {
           <Text style={styles.backText}>‹ Back</Text>
         </TouchableOpacity>
 
-        {/* Logo */}
         <Image
           source={require('../../../../assets/icons/CodeMide.png')}
           style={styles.logo}
@@ -66,18 +61,38 @@ export default function StudentSession({ navigation, route }) {
         />
       </View>
 
-      
-      {/* MAIN CARD */}
       <View style={styles.mainCard}>
         <Text style={styles.heading}>Session History:</Text>
         <Text style={styles.subHeading}>All Sessions</Text>
 
         {sessions.map(item => (
           <View key={item.sessionId} style={styles.sessionCard}>
-            <Text style={styles.date}>Date: {item.date ?? 'No Date'}</Text>
+            {/* DATE + 3 DOT MENU */}
+            <View style={styles.dateRow}>
+              <Text style={styles.date}>Date: {item.date ?? 'No Date'}</Text>
+          
+              <TouchableOpacity
+
+              
+                onPress={() =>
+                  navigation.navigate('StudentSessionReport', {
+                    sessionId: item.sessionId,
+                    studentId: student?.sid,
+                    
+                    
+                  })
+                }
+              >
+                
+                <Image
+                  source={require('../../../../assets/icons/three-dot-menu.png')}
+                  style={styles.menuIcon}
+                />
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.metricsRow}>
-              {/* Blood Pressure */}
+              {/* BP */}
               <View style={styles.metricBox}>
                 <Image
                   source={require('../../../../assets/icons/Cuff Icon.jpg')}
@@ -89,7 +104,7 @@ export default function StudentSession({ navigation, route }) {
                 </Text>
               </View>
 
-              {/* Heart Rate */}
+              {/* HR */}
               <View style={styles.metricBox}>
                 <Image
                   source={require('../../../../assets/icons/Heart Icon.png')}
@@ -119,10 +134,7 @@ export default function StudentSession({ navigation, route }) {
         ))}
       </View>
 
-    
-          {/* Bottom spacing */}
-          <View style={{ height: 40 }} />
-
+      <View style={{ height: 40 }} />
     </ScrollView>
   );
 }
@@ -149,7 +161,7 @@ const styles = StyleSheet.create({
 
   // Logo style
   logo: {
-    height:75,
+    height: 75,
     width: 120,
     marginLeft: 52,
   },
@@ -172,18 +184,21 @@ const styles = StyleSheet.create({
   mainCard: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    padding: 5
+    padding: 5,
   },
 
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#2BA6B3',
+    marginLeft: 10,
+    marginTop: 10,
   },
 
   subHeading: {
     color: '#777',
     marginBottom: 10,
+    marginLeft: 10,
   },
 
   sessionCard: {
@@ -201,8 +216,6 @@ const styles = StyleSheet.create({
   metricsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    
-    
   },
 
   metricBox: {
@@ -223,20 +236,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     marginTop: 2,
-    marginBottom: 4
+    marginBottom: 4,
   },
-  icon:{
-  width:30,
-  height:30,
-  marginBottom:4,
-  marginTop: 4
-},
+  icon: {
+    width: 30,
+    height: 30,
+    marginBottom: 4,
+    marginTop: 4,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 
-  
+  menuIcon: {
+    width: 28,
+    height: 25,
+    marginRight: 8,
+    marginBottom: 4,
+  },
 
   stress: {
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 8 ,
     fontSize: 12,
   },
 });
