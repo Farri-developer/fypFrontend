@@ -1,3 +1,5 @@
+
+
 const BASE_URL = "http://192.168.100.7:5000/api";
 
 
@@ -56,4 +58,40 @@ export const getAllSessions = async (studentId) => {
 
   }
 
+};
+
+
+// 👉 Student Session Report
+export const getStudentSessionReport = async (sid, sessionId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/report/student_session_report/${sid}/${sessionId}`
+    );
+
+    const data = await response.json();
+
+    return data;
+
+  } catch (error) {
+    console.log("Error: ", error);
+    return null;
+  }
+};
+
+
+// 👉 EEG Data
+export const getEEGData = async (sid, sessionId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/devices/eeg/all?sessionid=${sessionId}&sid=${sid}`
+    );
+
+    const data = await response.json();
+
+    return data;
+
+  } catch (error) {
+    console.log("Error:", error);
+    return null;
+  }
 };

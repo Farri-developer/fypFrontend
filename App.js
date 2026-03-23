@@ -56,10 +56,10 @@ export default function App() {
 
         />
 
-        {/* <Stack.Screen
+        <Stack.Screen
           name="StudentQuestionReport"
           component={StudentQuestionReport}
-        /> */}
+        />
 
       </Stack.Navigator>
     </NavigationContainer>
