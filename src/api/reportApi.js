@@ -78,7 +78,6 @@ export const getStudentSessionReport = async (sid, sessionId) => {
   }
 };
 
-
 // 👉 EEG Data
 export const getEEGData = async (sid, sessionId) => {
   try {
@@ -92,6 +91,94 @@ export const getEEGData = async (sid, sessionId) => {
 
   } catch (error) {
     console.log("Error:", error);
+    return null;
+  }
+};
+
+
+
+
+
+
+// ✅ Question Report Graph APIs
+export const getEEGDelta = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/delta?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("Delta Error:", err);
+    return null;
+  }
+};
+
+export const getEEGTheta = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/theta?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("Theta Error:", err);
+    return null;
+  }
+};
+
+export const getEEGAlpha = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/alpha?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("Alpha Error:", err);
+    return null;
+  }
+};
+
+export const getEEGBeta = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/beta?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("Beta Error:", err);
+    return null;
+  }
+};
+
+export const getEEGGamma = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/gamma?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("Gamma Error:", err);
+    return null;
+  }
+};
+
+
+// 👉 Student Question Report
+export const getStudentQuestionReport = async (sid, qid) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/report/student_question_report/${sid}/${qid}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch question report");
+    }
+
+    return data;
+
+  } catch (error) {
+    console.log("Question Report API Error:", error);
     return null;
   }
 };

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { LineChart } from 'react-native-chart-kit';
+
 import {
   View,
   Text,
@@ -6,30 +8,52 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
-import { getStudentSessionReport } from '../../../api/reportApi';
+import {
+  getStudentSessionReport,
+  getEEGData
+} from '../../../api/reportApi';
 
 export default function StudentSessionReport({ navigation, route }) {
-
   const { sessionId, studentId } = route.params;
 
   const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [eeg, setEeg] = useState(null);
+
+  const [loading, setLoading] = useState(true);       // main data
+  const [graphLoading, setGraphLoading] = useState(true); // graph
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const res = await getStudentSessionReport(studentId, sessionId);
-    setReport(res);
-    setLoading(false);
+    try {
+      // ✅ STEP 1: FAST LOAD
+      const res = await getStudentSessionReport(studentId, sessionId);
+      setReport(res);
+      setLoading(false); // screen show
+
+      // ✅ STEP 2: GRAPH LOAD (slow)
+      const eegData = await getEEGData(studentId, sessionId);
+      setEeg(eegData);
+
+    } catch (error) {
+      console.log('ERROR:', error);
+    } finally {
+      setGraphLoading(false);
+    }
   };
 
+  // ✅ MAIN LOADING
   if (loading) {
-    return <ActivityIndicator size="large" style={{ flex: 1 }} />;
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
   }
 
   return (
@@ -47,28 +71,106 @@ export default function StudentSessionReport({ navigation, route }) {
         />
 
         <Text style={styles.name}>
-          { `- ${report?.student_name} -` || "Student"}
+          {`- ${report?.student_name || 'Student'} -`}
         </Text>
       </View>
 
-      {/* SUMMARY CARD */}
+      {/* SUMMARY */}
       <View style={styles.card}>
         <Text style={styles.heading}>Overall Stress & Performance Summary</Text>
 
-        <Text>Final Stress Level: <Text style={styles.bold}>{report?.final_stress_level || "-"}</Text></Text>
-        <Text>Date: {report?.date || "-"}</Text>
-        <Text>Time: {report?.total_minutes || "-"} mins</Text>
+        <Text>Final Stress Level: {report?.final_stress_level || '-'}</Text>
+        <Text>Date: {report?.date || '-'}</Text>
+        <Text>Time: {report?.total_minutes || '-'} mins</Text>
 
         <Text style={styles.subHeading}>Blood Pressure (BP)</Text>
-        <Text>{report?.average_bp || "-"}</Text>
+        <Text>{report?.average_bp || '-'}</Text>
 
         <Text style={styles.subHeading}>Heart Rate Variability</Text>
-        <Text>HR: {report?.HR || "-"} BPM</Text>
-        <Text>RMSSD: {report?.RMSSD || "-"}</Text>
-        <Text>SDNN: {report?.SDNN || "-"}</Text>
+        <Text>HR: {report?.HR || '-'}</Text>
+        <Text>RMSSD: {report?.RMSSD || '-'}</Text>
+        <Text>SDNN: {report?.SDNN || '-'}</Text>
       </View>
 
-      {/* QUESTIONS SECTION */}
+      {/* GRAPH */}
+      <View style={styles.card}>
+        <Text style={styles.heading}>Physiological Signals During Session</Text>
+
+        {graphLoading ? (
+          <ActivityIndicator size="small" color="#000" />
+        ) : eeg?.alpha?.length > 0 ? (
+          (() => {
+
+            const time = eeg.time || [];
+            const alpha = eeg.alpha || [];
+            const beta = eeg.beta || [];
+            const theta = eeg.theta || [];
+            const gamma = eeg.gamma || [];
+
+            const minLength = Math.min(
+              time.length,
+              alpha.length,
+              beta.length,
+              theta.length,
+              gamma.length
+            );
+
+            const safeTime = time.slice(0, minLength);
+            const safeAlpha = alpha.slice(0, minLength);
+            const safeBeta = beta.slice(0, minLength);
+            const safeTheta = theta.slice(0, minLength);
+            const safeGamma = gamma.slice(0, minLength);
+
+            const labels = safeTime.map((t, i) =>
+              i % 20 === 0 ? `${t}s` : ''
+            );
+
+            return (
+              <ScrollView horizontal>
+                <LineChart
+                  data={{
+                    labels: labels,
+                    datasets: [
+                      { data: safeAlpha, color: () => '#3CBAC8' },
+                      { data: safeBeta, color: () => '#FF6B6B' },
+                      { data: safeTheta, color: () => '#FFD93D' },
+                      { data: safeGamma, color: () => '#6BCB77' },
+                    ],
+                    legend: ['Alpha', 'Beta', 'Theta', 'Gamma'],
+                  }}
+                  width={Math.max(safeTime.length * 8, 1000)}
+                  height={260}
+                  withDots={false}
+                  chartConfig={{
+                    backgroundColor: '#fff',
+                    backgroundGradientFrom: '#fff',
+                    backgroundGradientTo: '#fff',
+                    decimalPlaces: 2,
+                    color: () => '#000',
+                    labelColor: () => '#000',
+                    propsForBackgroundLines: {
+                      stroke: '#ccc',
+                      strokeDasharray: '5,5',
+                    },
+                  }}
+                  bezier
+                  style={{ borderRadius: 10, marginTop: 10 }}
+                />
+              </ScrollView>
+            );
+
+          })()
+        ) : (
+          <Text style={styles.noData}>No Graph Data</Text>
+        )}
+
+        <Text style={{ marginTop: 10 }}>EEG Band Power Summary:</Text>
+        <Text>Alpha → Relaxation</Text>
+        <Text>Beta → Focus / Stress</Text>
+        <Text>Theta → Mental Workload</Text>
+      </View>
+
+      {/* QUESTIONS */}
       <View style={styles.reportSection}>
         <Text style={styles.reportTitle}>Reports of Each Question</Text>
 
@@ -80,10 +182,10 @@ export default function StudentSessionReport({ navigation, route }) {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() =>
-                  navigation.navigate("StudentQuestionReport", {
+                  navigation.navigate('StudentQuestionReport', {
                     sid: studentId,
                     sessionId: sessionId,
-                    qid: item.qid
+                    qid: item.qid,
                   })
                 }
               >
@@ -104,85 +206,86 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
+    backgroundColor: '#3CBAC8',
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#3CBAC8'
   },
 
   header: {
     marginTop: 20,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   backBtn: {
     position: 'absolute',
     left: 15,
-    top: 18
+    top: 18,
   },
 
   back: {
     color: '#fff',
-    fontSize: 18
+    fontSize: 18,
   },
 
   logo: {
     width: 55,
     height: 80,
-    marginBottom: 20
+    marginBottom: 20,
   },
 
   name: {
     fontSize: 22,
     color: '#fff',
     fontWeight: 'bold',
-    
   },
 
   card: {
     backgroundColor: '#fff',
     margin: 20,
     padding: 15,
-    borderRadius: 15
+    borderRadius: 15,
   },
 
   heading: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   subHeading: {
     marginTop: 10,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
-  bold: {
-    fontWeight: 'bold'
-  },
-
-  /* ✅ WHITE SECTION */
   reportSection: {
     backgroundColor: '#fff',
     marginHorizontal: 20,
     padding: 15,
     borderRadius: 15,
-    marginBottom: 30
+    marginBottom: 30,
   },
 
   reportTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   questionCard: {
     backgroundColor: '#5ED0DB',
     padding: 15,
     borderRadius: 15,
-    marginBottom: 15
+    marginBottom: 15,
   },
 
   questionText: {
     color: '#fff',
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   button: {
@@ -191,19 +294,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignSelf: 'center',
     width: 100,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   buttonText: {
     color: '#3CBAC8',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
-  /* ✅ NO DATA */
   noData: {
     textAlign: 'center',
     color: 'gray',
-    marginTop: 10
+    marginTop: 10,
   }
 
 });
