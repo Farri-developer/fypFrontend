@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#3CBAC8',
+    backgroundColor: '#48D1E4',
     padding: 20
   },
 
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#3CBAC8'
+    backgroundColor: '#48D1E4'
   },
 
   back: {
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
 
   question: {
     textAlign: 'center',
-    color: '#3CBAC8',
+    color: '#48D1E4',
     fontWeight: 'bold'
   },
 

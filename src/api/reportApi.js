@@ -182,3 +182,28 @@ export const getStudentQuestionReport = async (sid, qid) => {
     return null;
   }
 };
+
+
+
+// 👉 Top 5 Sessions (Dashboard)
+export const getTopSessions = async (sid) => {
+  try {
+
+    const response = await fetch(
+      `${BASE_URL}/report/sessiontop5/${sid}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.log("Top Sessions API Error:", response.status);
+      return [];
+    }
+
+    return data;
+
+  } catch (error) {
+    console.log("Top Sessions ERROR:", error);
+    return [];
+  }
+};             

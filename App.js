@@ -24,6 +24,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+         {/* auth screens */}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
@@ -32,11 +34,9 @@ export default function App() {
           options={{ headerShown: false }}
         />
 
-        {/* auth screens */}
-        <Stack.Screen name="Admin" component={AdminScreen} />
-        <Stack.Screen name="StudentTabs" component={StudentTabs} />
-
         {/* Admin Screens */}
+        <Stack.Screen name="Admin" component={AdminScreen} />
+      
 
         {/* Admin Question Screen  */}
         <Stack.Screen name="EditQuestion" component={EditQuestion} />
@@ -46,20 +46,21 @@ export default function App() {
         {/* Admin Student Screen  */}
         <Stack.Screen name="EditStudent" component={EditStudent} />
         <Stack.Screen name="AddStudent" component={AddStudent} />
-
-        {/* Admin Student Sessions Screen  */}
         <Stack.Screen name="StudentSession" component={StudentSession} />
-
         <Stack.Screen
           name="StudentSessionReport"
           component={StudentSessionReport}
 
         />
-
         <Stack.Screen
           name="StudentQuestionReport"
           component={StudentQuestionReport}
         />
+
+
+
+        {/* Student Screens */}
+         <Stack.Screen name="StudentTabs" component={StudentTabs} />
 
       </Stack.Navigator>
     </NavigationContainer>

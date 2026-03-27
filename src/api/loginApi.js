@@ -21,6 +21,7 @@ export const loginUser = async (username, password) => {
     if (!response.ok) {
       throw new Error(data.error || 'Login failed');
     }
+    
 
     return data;
   } catch (error) {

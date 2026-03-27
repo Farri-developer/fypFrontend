@@ -206,14 +206,14 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#3CBAC8',
+    backgroundColor: '#48D1E4',
   },
 
   loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#3CBAC8'
+    backgroundColor: '#48D1E4'
   },
 
   header: {
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
 
   questionCard: {
-    backgroundColor: '#5ED0DB',
+    backgroundColor: '#48D1E4',
     padding: 15,
     borderRadius: 15,
     marginBottom: 15,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#3CBAC8',
+    color: '#48D1E4',
     fontWeight: 'bold',
   },
 

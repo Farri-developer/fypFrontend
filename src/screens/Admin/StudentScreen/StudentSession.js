@@ -142,7 +142,7 @@ export default function StudentSession({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#59C6D8',
+    backgroundColor: '#48D1E4',
     padding: 15,
   },
 
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2BA6B3',
+    color: '#48D1E4',
     marginLeft: 10,
     marginTop: 10,
   },
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
 
   metricBox: {
     alignItems: 'center',
-    backgroundColor: '#4EB9C6',
+    backgroundColor: '#48D1E4',
     padding: 5,
     margin: 2,
     borderRadius: 10,
