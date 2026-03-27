@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
 
   date: {
-    fontWeight: 'bold',
+  
     marginBottom: 8,
   },
 

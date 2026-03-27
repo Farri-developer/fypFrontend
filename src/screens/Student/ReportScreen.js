@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 
-import { getAllSessions } from '../../../api/reportApi'; // adjust path as needed
+import { getAllSessions } from '../../api/reportApi'; // adjust path as needed
 
 export default function ReportScreen({ navigation, route }) {
 
@@ -55,7 +55,7 @@ export default function ReportScreen({ navigation, route }) {
         </TouchableOpacity>
 
         <Image
-          source={require('../../../../assets/icons/CodeMide.png')}
+          source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -89,7 +89,7 @@ export default function ReportScreen({ navigation, route }) {
                   }
                 >
                   <Image
-                    source={require('../../../../assets/icons/three-dot-menu.png')}
+                    source={require('../../../assets/icons/three-dot-menu.png')}
                     style={styles.menuIcon}
                   />
                 </TouchableOpacity>
@@ -101,7 +101,7 @@ export default function ReportScreen({ navigation, route }) {
                 {/* BP */}
                 <View style={styles.metricBox}>
                   <Image
-                    source={require('../../../../assets/icons/Cuff Icon.jpg')}
+                    source={require('../../../assets/icons/Cuff Icon.jpg')}
                     style={styles.icon}
                   />
                   <Text style={styles.metricTitle}>BP</Text>
@@ -113,7 +113,7 @@ export default function ReportScreen({ navigation, route }) {
                 {/* HR */}
                 <View style={styles.metricBox}>
                   <Image
-                    source={require('../../../../assets/icons/Heart Icon.png')}
+                    source={require('../../../assets/icons/Heart Icon.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.metricTitle}>HR</Text>
@@ -125,7 +125,7 @@ export default function ReportScreen({ navigation, route }) {
                 {/* HRV */}
                 <View style={styles.metricBox}>
                   <Image
-                    source={require('../../../../assets/icons/heart.png')}
+                    source={require('../../../assets/icons/heart.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.metricTitle}>HRV</Text>
@@ -216,9 +216,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  date: {
-    fontWeight: 'bold',
-  },
+ 
+  
 
   metricsRow: {
     flexDirection: 'row',
