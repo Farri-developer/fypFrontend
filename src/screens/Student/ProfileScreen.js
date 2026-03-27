@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#48D1E4' },
 
   backButton: { alignSelf: 'flex-start', margin: 15, marginTop: 25 },
-  backText: { color: 'white', fontSize: 16, fontWeight: '600' ,marginTop:5  },
+  backText: { color: 'white', fontSize: 16   },
 
   scrollContent: { paddingTop: 10, alignItems: 'center', paddingBottom: 30 },
 
   profile: { width: 120, height: 120, marginTop: 10 },
-  logo: { width: 90, height: 90 , marginLeft: 59,},
+  logo: { width: 75, height: 75 , marginLeft: 70,},
  
   title: {
     fontSize: 22,

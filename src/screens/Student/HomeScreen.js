@@ -5,13 +5,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 import { getTopSessions } from '../../api/reportApi'; // adjust path
 
 export default function HomeScreen({ navigation, route }) {
-
   const { sid, name, semester } = route.params;
   const [sessions, setSessions] = useState([]);
 
@@ -26,17 +25,26 @@ export default function HomeScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
+        {/* LEFT: Logout */}
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.logout}>‹ Logout</Text>
         </TouchableOpacity>
 
+        {/* CENTER: Logo */}
         <Image
           source={require('../../../assets/icons/CodeMide.png')}
           style={styles.logo}
         />
+
+        {/* RIGHT: Profile Icon */}
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <Image
+            source={require('../../../assets/icons/Profilew.png')}
+            style={styles.profileIcon}
+          />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.hello}>Hello {name}!</Text>
@@ -44,18 +52,21 @@ export default function HomeScreen({ navigation, route }) {
 
       {/* CARD */}
       <View style={styles.dashboard}>
-
         <Text style={styles.heading}>Student Dashboard</Text>
 
         {/* BUTTON */}
-        <TouchableOpacity style={styles.startBtn}>
+        <TouchableOpacity
+          style={styles.startBtn}
+          onPress={() => navigation.navigate('Test')}
+        >
           <Text style={styles.startText}>▶ Start New Test</Text>
         </TouchableOpacity>
 
         {/* SUMMARY HEADER */}
         <View style={styles.summaryHeader}>
           <Text style={styles.summaryText}>Last Test Summary</Text>
-          <TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Report')}>
             <Text style={styles.seeAll}>see all ›</Text>
           </TouchableOpacity>
         </View>
@@ -63,34 +74,28 @@ export default function HomeScreen({ navigation, route }) {
         <ScrollView showsVerticalScrollIndicator={false}>
           {sessions.map((item, index) => (
             <View key={index} style={styles.card}>
-
               {/* TOP */}
               <View style={styles.rowBetween}>
-                <Text style={styles.date}>
-                  Date: {item.date || 'N/A'}
-                </Text>
+                <Text style={styles.date}>Date: {item.date || 'N/A'}</Text>
 
                 {/* 3 DOT */}
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate('StudentSessionReport', {
-
                       sessionId: item.sessionId,
-                      studentId: sid
+                      studentId: sid,
                     })
                   }
                 >
                   <Image
                     source={require('../../../assets/icons/three-dot-menu.png')}
                     style={styles.dot}
-                    
                   />
                 </TouchableOpacity>
               </View>
 
               {/* DATA */}
               <View style={styles.row}>
-
                 {/* BP */}
                 <View style={styles.box}>
                   <Image
@@ -109,9 +114,7 @@ export default function HomeScreen({ navigation, route }) {
                     source={require('../../../assets/icons/Heart Icon.png')}
                     style={styles.icon}
                   />
-                  <Text style={styles.value}>
-                    {item.heartRate || '--'}
-                  </Text>
+                  <Text style={styles.value}>{item.heartRate || '--'}</Text>
                   <Text style={styles.label}>BPM</Text>
                 </View>
 
@@ -121,77 +124,74 @@ export default function HomeScreen({ navigation, route }) {
                     source={require('../../../assets/icons/heart.png')}
                     style={styles.icon}
                   />
-                  <Text style={styles.value}>
-                    {item.sdnn || '--'}
-                  </Text>
+                  <Text style={styles.value}>{item.sdnn || '--'}</Text>
                   <Text style={styles.label}>ms</Text>
                 </View>
-
               </View>
 
               <Text style={styles.stress}>
                 Overall Stress Level: {item.stressLevel || 'Unknown'}
               </Text>
-
             </View>
           ))}
         </ScrollView>
-
       </View>
-
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    padding: 15
+    paddingLeft: 15,  
+    paddingRight: 15,
   },
 
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   logout: {
     color: '#fff',
-    fontSize: 16
+    fontSize: 16,
+  },
+  profileIcon: {
+    width: 30,
+    height: 30,
   },
 
   logo: {
     width: 75,
     height: 75,
     resizeMode: 'contain',
-    marginRight: 130
+    marginRight: 19 ,
   },
 
   hello: {
     fontSize: 22,
     color: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
 
   semester: {
     color: '#fff',
-    marginBottom: 15
+    marginBottom: 15,
   },
 
   dashboard: {
     backgroundColor: '#eee',
     borderRadius: 20,
     padding: 15,
-    flex: 1
+    flex: 1,
   },
 
   heading: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#48D1E4'
+    color: '#48D1E4',
   },
 
   startBtn: {
@@ -199,44 +199,44 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     marginVertical: 15,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   startText: {
     color: '#fff',
-    fontSize: 16
+    fontSize: 16,
   },
 
   summaryHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
 
   summaryText: {
-    color: '#48D1E4'
+    color: '#48D1E4',
   },
 
   seeAll: {
-    color: '#48D1E4'
+    color: '#48D1E4',
   },
 
   card: {
     backgroundColor: '#cfe8eb',
     padding: 15,
     borderRadius: 15,
-    marginTop: 10
+    marginTop: 10,
   },
 
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10
+    marginTop: 10,
   },
 
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   box: {
@@ -244,34 +244,34 @@ const styles = StyleSheet.create({
     width: '30%',
     borderRadius: 10,
     padding: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   icon: {
     width: 20,
     height: 20,
-    marginBottom: 5
+    marginBottom: 5,
   },
 
   value: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   label: {
     color: '#fff',
-    fontSize: 10
+    fontSize: 10,
   },
 
   stress: {
     marginTop: 10,
     textAlign: 'center',
-    color: '#333'
+    color: '#333',
   },
 
   dot: {
     width: 20,
-    height: 20
+    height: 20,
   },
 
   bottom: {
@@ -280,7 +280,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     padding: 15,
     borderRadius: 20,
-    marginTop: 10
-  }
-
+    marginTop: 10,
+  },
 });

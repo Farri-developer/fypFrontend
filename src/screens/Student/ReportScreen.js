@@ -154,7 +154,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    padding: 15,
+    paddingLeft: 15,  
+    paddingRight: 15,
   },
 
   loader: {
@@ -163,20 +164,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  backButton: {
-    marginTop: 20,
-  },
 
   backText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '600',
+
   },
 
   logo: {
     height: 75,
-    width: 120,
-    marginLeft: 60,
+    width: 75,
+    marginLeft: 85,
   },
 
   studentCard: {
@@ -196,6 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10,
   },
+
 
   heading: {
     fontSize: 20,
