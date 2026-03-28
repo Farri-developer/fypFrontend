@@ -14,6 +14,7 @@ import AdminScreen from './src/screens/Admin/AdminTab';
 import StudentTabs from './src/screens/Student/StudentTabs';
 import StudentSessionReport from './src/screens/Admin/StudentScreen/StudentSessionReport';
 import StudentQuestionReport from './src/screens/Admin/StudentScreen/StudentQuestionReport';
+import Baselinebp from './src/screens/Student/Session/Baselinebp';
 
 import AddQuestionScreen from './src/screens/Admin/QuestionScreen/AddQuestionScreen';
 import { ScreenStackHeaderLeftView } from 'react-native-screens';
@@ -35,6 +36,13 @@ export default function App() {
         {/* auth screens */}
         <Stack.Screen name="Admin" component={AdminScreen} />
         <Stack.Screen name="StudentTabs" component={StudentTabs} />
+
+
+
+
+
+
+
 
         {/* Admin Screens */}
 
@@ -60,6 +68,13 @@ export default function App() {
           name="StudentQuestionReport"
           component={StudentQuestionReport}
         />
+
+
+
+        {/* Student Screens */}
+        
+        <Stack.Screen name="Baselinebp" component={Baselinebp} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

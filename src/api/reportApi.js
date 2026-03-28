@@ -206,4 +206,33 @@ export const getTopSessions = async (sid) => {
     console.log("Top Sessions ERROR:", error);
     return [];
   }
-};             
+};           
+
+export const getAllQuestions = async (sid) => {
+  try {
+    const questions = [];
+
+    // EASY
+    let res = await fetch(`${BASE_URL}/report/unattemptedeasy/${sid}`);
+    let data = await res.json();
+    if (data?.count > 0) questions.push(data);
+
+    // MEDIUM
+    res = await fetch(`${BASE_URL}/report/unattemptedmedium/${sid}`);
+    data = await res.json();
+    if (data?.count > 0) questions.push(data);
+
+    // HARD
+    res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
+    data = await res.json();
+    if (data?.count > 0) questions.push(data);
+
+    console.log("API DATA:", questions); // 🔥 debug
+
+    return questions;
+
+  } catch (error) {
+    console.log("API ERROR:", error);
+    return [];
+  }
+};

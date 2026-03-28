@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#48D1E4' },
 
   backButton: { alignSelf: 'flex-start', margin: 15, marginTop: 25 },
+  
   backText: { color: 'white', fontSize: 16   },
 
   scrollContent: { paddingTop: 10, alignItems: 'center', paddingBottom: 30 },

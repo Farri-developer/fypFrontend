@@ -3,7 +3,7 @@ import { Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './HomeScreen';
-import TestScreen from './TestScreen';
+import TestScreen from './Session/TestScreen';
 import ReportScreen from './ReportScreen';
 import ProfileScreen from './ProfileScreen';
 
