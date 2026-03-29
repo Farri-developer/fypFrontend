@@ -5,77 +5,107 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
-import { startBaselineBP, startRecording } from '../../../api/sessionApi';
+import {
+  afterQuestionBP,
+  stopStream,
+  startRecording   // ✅ FIXED NAME
+} from '../../../api/sessionApi';
 
-export default function Baselinebp({ route, navigation }) {
+export default function Endbp({ route, navigation }) {
 
-  const { sid, questions } = route.params;
+  const params = route?.params || {};
+
+  const sid = params.sid || null;
+  const questions = params.questions || [];
 
   const [loading, setLoading] = useState(false);
   const [bpData, setBpData] = useState(null);
-  const [starting, setStarting] = useState(false);
+  const [finishing, setFinishing] = useState(false);
 
-  // 🔥 BP FUNCTION
+  // ✅ BP MEASURE
   const handleMeasure = async () => {
+    if (loading) return;
+
     try {
       setLoading(true);
 
-      const data = await startBaselineBP();
+      const data = await afterQuestionBP();
 
       if (data) {
-        setBpData(data); // ✅ enable next button
+        setBpData(data);
       } else {
-        alert("Failed to get BP");
+        alert('Failed to get BP');
       }
 
     } catch (error) {
-      console.log(error);
+      console.log("BP ERROR:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔥 NEXT BUTTON FUNCTION
+  // ✅ NEXT BUTTON (FULL FIXED)
   const handleNext = async () => {
+    if (finishing) return;
+
     try {
-      setStarting(true);
+      setFinishing(true);
 
-      if (!questions || questions.length === 0) {
-        alert("No questions available");
-        return;
-      }
+      console.log("NEXT CLICKED");
+      console.log("Remaining Questions:", questions);
 
+      // 🔁 CASE 1: QUESTIONS AVAILABLE
+      if (questions.length > 0) {
 
+        const nextQuestion = questions[0];
+         
 
+        console.log("START RECORDING:", nextQuestion?.qid, sid);
 
+        // ✅ START RECORDING WITH qid + sid
+        const startRes = await startRecording(
+          sid,
+          nextQuestion?.qid // ✅ FIXED: qid is now an array
+          
+        );
 
-      // ✅ first question
-      const firstQuestion = questions[0];
+        if (!startRes) {
+          alert('Failed to start recording');
+          setFinishing(false);
+          return;
+        }
 
-
-      // 🔥 API CALL
-      const data = await startRecording(sid, firstQuestion.qid);
-
-      if (data && data.status === "recording started") {
-
-        // ✅ Navigate
-        navigation.navigate("QuestionAttempt", {
+        // ✅ NAVIGATE TO QUESTION
+        navigation.replace('QuestionAttempt', {
           questions: questions,
           sid: sid,
         });
 
-      } else {
-        alert("Recording start failed");
+        return;
       }
 
+      // 🛑 CASE 2: NO QUESTIONS → STOP STREAM
+      console.log("NO QUESTIONS → STOP STREAM");
+
+      const stopRes = await stopStream();
+
+      if (!stopRes) {
+        alert('Failed to stop session');
+        setFinishing(false);
+        return;
+      }
+
+      // ✅ GO TO SELF REPORT
+      navigation.replace('SelfReport', {
+        sid: sid,
+      });
+
     } catch (error) {
-      console.log(error);
-      alert("Something went wrong");
-    } finally {
-      setStarting(false);
+      console.log("NEXT ERROR:", error);
+      setFinishing(false);
     }
   };
 
@@ -84,7 +114,9 @@ export default function Baselinebp({ route, navigation }) {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.back}>← Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.back}>‹ Back</Text>
+        </TouchableOpacity>
 
         <Image
           source={require('../../../../assets/icons/CodeMide.png')}
@@ -92,7 +124,10 @@ export default function Baselinebp({ route, navigation }) {
         />
       </View>
 
-      <Text style={styles.title}>Take Baseline Reading</Text>
+      {/* TITLE */}
+      <Text style={styles.title}>After Question BP</Text>
+      <Text style={styles.title}>Session ID: {sid}</Text>
+      <Text style={styles.title}>Questions: {questions.length}</Text>
 
       {/* IMAGE */}
       <Image
@@ -103,21 +138,21 @@ export default function Baselinebp({ route, navigation }) {
       {/* CARD */}
       <View style={styles.card}>
         <Text style={styles.cardText}>
-          Please turn on the Rossmax monitoring device and wear the cuff properly on your arm before taking the reading.
+          Please take your blood pressure after this question.
         </Text>
 
         <TouchableOpacity style={styles.measureBtn} onPress={handleMeasure}>
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.measureText}>Measure Blood Pressure</Text>
+            <Text style={styles.measureText}>Measure BP</Text>
           )}
         </TouchableOpacity>
       </View>
 
       {/* RESULT */}
       <View style={styles.resultCard}>
-        <Text style={styles.resultTitle}>Your Blood Pressure Reading:</Text>
+        <Text style={styles.resultTitle}>BP Reading:</Text>
 
         <Text style={styles.resultText}>
           Systolic: {bpData ? bpData.SYS : '___'} mmHg
@@ -130,6 +165,10 @@ export default function Baselinebp({ route, navigation }) {
         <Text style={styles.resultText}>
           Pulse: {bpData ? bpData.PULSE : '___'} bpm
         </Text>
+
+        <Text style={styles.resultText}>
+          Session ID: {bpData ? bpData.SESSIONID : '___'}
+        </Text>
       </View>
 
       {/* NEXT BUTTON */}
@@ -138,13 +177,13 @@ export default function Baselinebp({ route, navigation }) {
           styles.nextBtn,
           {
             opacity: bpData ? 1 : 0.5,
-            backgroundColor: bpData ? '#48D1E4' : '#ccc'
-          }
+            backgroundColor: bpData ? '#48D1E4' : '#ccc',
+          },
         ]}
-        disabled={!bpData || starting}
+        disabled={!bpData || finishing}
         onPress={handleNext}
       >
-        {starting ? (
+        {finishing ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.nextText}>Next</Text>
@@ -172,7 +211,6 @@ const styles = StyleSheet.create({
   back: {
     position: 'absolute',
     left: 15,
-    top: 0,
     color: 'white',
   },
 
@@ -248,7 +286,7 @@ const styles = StyleSheet.create({
 
   nextText: {
     fontWeight: 'bold',
-    color: 'white'
+    color: 'white',
   }
 
 });

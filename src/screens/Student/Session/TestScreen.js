@@ -13,7 +13,6 @@ import { getAllQuestions } from '../../../api/reportApi';
 import { startSession } from '../../../api/sessionApi';
 
 export default function TestScreen({ route, navigation }) {
-
   const { sid, name, semester } = route.params;
 
   // 🔥 Separate states
@@ -51,7 +50,6 @@ export default function TestScreen({ route, navigation }) {
       } else {
         alert('Failed to start session');
       }
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -80,16 +78,23 @@ export default function TestScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Text style={styles.back}>← Back</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center',  }}>
+        {/* Back Button */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
 
         <Image
           source={require('../../../../assets/icons/CodeMide.png')}
           style={styles.logo}
         />
+      </View>
 
+      {/* HEADER */}
+      <View style={styles.header}>
         <Text style={styles.title}>Programming Test</Text>
 
         <Image
@@ -100,7 +105,6 @@ export default function TestScreen({ route, navigation }) {
 
       {/* CARD */}
       <ScrollView contentContainerStyle={styles.card}>
-
         {/* QUESTIONS */}
         {questions.map((q, index) => (
           <View key={q.qid} style={styles.questionBox}>
@@ -108,15 +112,16 @@ export default function TestScreen({ route, navigation }) {
 
             <Text style={styles.text}>{q.description}</Text>
 
-            <Text style={styles.duration}>
-              Duration: {q.duration} minutes
-            </Text>
+            <Text style={styles.duration}>Duration: {q.duration} minutes</Text>
+
+             <Text style={styles.duration}>qid: {q.qid} minutes</Text> 
           </View>
         ))}
 
         {/* NOTES */}
         <Text style={styles.note}>
-          Your focus level, stress, and heart rate signals will be recorded during the test.
+          Your focus level, stress, and heart rate signals will be recorded
+          during the test.
         </Text>
 
         <Text style={styles.warning}>
@@ -135,36 +140,30 @@ export default function TestScreen({ route, navigation }) {
             <Text style={styles.buttonText}>Start Test</Text>
           )}
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#43b7c5',
+    backgroundColor: '#48D1E4',
   },
 
   header: {
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
   },
 
-  back: {
-    position: 'absolute',
-    left: 15,
-    top: 40,
-    color: 'white',
-    fontSize: 16,
-  },
+  backText: { color: 'white', fontSize: 16 },
+
+  backButton: { alignSelf: 'flex-start', marginLeft: 20 ,marginTop: 25},
 
   logo: {
-    width: 100,
-    height: 40,
-    resizeMode: 'contain',
+    width: 75,
+    height: 75,
+    marginLeft: 70,
   },
 
   title: {
@@ -186,7 +185,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
 
   card: {
     backgroundColor: '#ffffff',
@@ -217,7 +215,7 @@ const styles = StyleSheet.create({
   duration: {
     marginTop: 5,
     fontWeight: 'bold',
-    color: '#00bcd4',
+    color: '#48D1E4',
   },
 
   note: {
@@ -230,7 +228,7 @@ const styles = StyleSheet.create({
   warning: {
     marginTop: 10,
     fontSize: 12,
-    color: '#00bcd4',
+    color: '#48D1E4',
     textAlign: 'center',
   },
 
@@ -243,7 +241,7 @@ const styles = StyleSheet.create({
 
   button: {
     marginTop: 20,
-    backgroundColor: '#00bcd4',
+    backgroundColor: '#48D1E4',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

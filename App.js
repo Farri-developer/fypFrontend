@@ -15,6 +15,10 @@ import StudentTabs from './src/screens/Student/StudentTabs';
 import StudentSessionReport from './src/screens/Admin/StudentScreen/StudentSessionReport';
 import StudentQuestionReport from './src/screens/Admin/StudentScreen/StudentQuestionReport';
 import Baselinebp from './src/screens/Student/Session/Baselinebp';
+import QuestionAttempt from './src/screens/Student/Session/QuestionAttempt';
+import Endbp from './src/screens/Student/Session/Endbp';
+import SelfReport from './src/screens/Student/Session/SelfReport';
+
 
 import AddQuestionScreen from './src/screens/Admin/QuestionScreen/AddQuestionScreen';
 import { ScreenStackHeaderLeftView } from 'react-native-screens';
@@ -74,6 +78,10 @@ export default function App() {
         {/* Student Screens */}
         
         <Stack.Screen name="Baselinebp" component={Baselinebp} />
+        <Stack.Screen name="QuestionAttempt" component={QuestionAttempt} />
+        <Stack.Screen name="Endbp" component={Endbp} />
+        <Stack.Screen name="SelfReport" component={SelfReport} />
+
 
 
       </Stack.Navigator>

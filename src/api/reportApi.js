@@ -224,8 +224,9 @@ export const getAllQuestions = async (sid) => {
 
     // HARD
     res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
+    
     data = await res.json();
-    if (data?.count > 0) questions.push(data);
+    // if (data?.count > 0) questions.push(data);
 
     console.log("API DATA:", questions); // 🔥 debug
 
