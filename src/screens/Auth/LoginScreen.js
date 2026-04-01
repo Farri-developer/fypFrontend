@@ -65,7 +65,7 @@ export default function LoginScreen({ navigation, route }) {
 
         console.log("Login Success:", data.sId, data.name, data.semester , data.role); ;
 
-        navigation.replace('StudentTabs', { sid: data.sId , name: data.name , semester : data.semester});
+        navigation.replace('StudentTabs', { sid: data.sId });
       }
     } catch (error) {
       Alert.alert('Login Failed', error.message);

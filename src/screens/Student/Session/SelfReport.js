@@ -5,24 +5,27 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
+  ScrollView,
   Image,
-  ActivityIndicator
 } from 'react-native';
 
-import { submitSelfReport } from '../../../api/sessionApi';
+import { deleteSession } from '../../../api/reportApi';
+import { submitSelfReport, resetAll } from '../../../api/sessionApi';
 
 export default function SelfReport({ route, navigation }) {
-
   const params = route?.params || {};
   const sid = params.sid || null;
 
-  const [mentalLoad, setMentalLoad] = useState(5);
-  const [frustration, setFrustration] = useState(5);
-  const [effort, setEffort] = useState(5);
-  const [comment, setComment] = useState("");
+  const [mentalLoad, setMentalLoad] = useState(3);
+  const [frustration, setFrustration] = useState(3);
+  const [effort, setEffort] = useState(3);
+  const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // 🔥 SUBMIT FUNCTION
+  let sessionid = null;
+
+  // ✅ SUBMIT
   const handleSubmit = async () => {
     if (loading) return;
 
@@ -33,26 +36,20 @@ export default function SelfReport({ route, navigation }) {
         mentalLoad,
         frustration,
         effort,
-        comment
+        comment,
       );
 
       if (!data) {
-        alert("Failed to submit report");
+        alert('Failed to submit report');
         return;
       }
 
-      // ✅ SESSION ID FROM API
-      const sessionid = data.sessionid;
+      sessionid = data.sessionid;
 
-      console.log("SESSION ID:", sessionid);
-
-      // ✅ NAVIGATE TO REPORT SCREEN
-      navigation.replace("StudentSessionReport", {
+      navigation.replace('Report', {
         sessionId: sessionid,
-        studentId: sid
-        
+        studentId: sid,
       });
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -60,37 +57,73 @@ export default function SelfReport({ route, navigation }) {
     }
   };
 
-  // 🔢 SCALE BUTTONS
-  const renderScale = (value, setValue) => {
+  // 🔙 BACK
+  const handleBack = async () => {
+    try {
+      if (sessionid) {
+        await deleteSession(sessionid);
+      }
+
+      await resetAll();
+      navigation.navigate('Test');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // 🎯 SECTION UI
+  const renderSection = (title, question, value, setValue) => {
+
+    const emojis = ['😐', '🙂', '😐', '😕', '😡'];
+
     return (
-      <View style={styles.scaleRow}>
-        {[1,2,3,4,5,6,7,8,9,10].map((num) => (
-          <TouchableOpacity
-            key={num}
-            style={[
-              styles.scaleBtn,
-              value === num && styles.activeBtn
-            ]}
-            onPress={() => setValue(num)}
-          >
-            <Text style={[
-              styles.scaleText,
-              value === num && { color: '#fff' }
-            ]}>
-              {num}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}:</Text>
+
+        <Text style={styles.question}>Question:</Text>
+        <Text style={styles.questionText}>{question}</Text>
+
+        <Text style={styles.helper}>Helper text:</Text>
+        <Text style={styles.helperText}>
+          Did the task require a lot of thinking, concentration or
+          problem-solving?
+        </Text>
+
+        {/* EMOJI */}
+        <View style={styles.emojiRow}>
+          {emojis.map((emoji, index) => (
+            <TouchableOpacity key={index} onPress={() => setValue(index + 1)}>
+              <Text
+                style={[
+                  styles.emoji,
+                  value === index + 1 && styles.activeEmoji,
+                ]}
+              >
+                {emoji}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* COLOR BAR */}
+        <View style={styles.colorBar}>
+          <View style={[styles.bar, { backgroundColor: 'green' }]} />
+          <View style={[styles.bar, { backgroundColor: '#9be79b' }]} />
+          <View style={[styles.bar, { backgroundColor: 'yellow' }]} />
+          <View style={[styles.bar, { backgroundColor: 'orange' }]} />
+          <View style={[styles.bar, { backgroundColor: 'red' }]} />
+        </View>
       </View>
     );
   };
 
   return (
     <View style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={styles.back}>‹ Back</Text>
+        <TouchableOpacity onPress={handleBack}>
+          <Text style={styles.back}>‹ Back</Text>
+        </TouchableOpacity>
 
         <Image
           source={require('../../../../assets/icons/CodeMide.png')}
@@ -98,132 +131,188 @@ export default function SelfReport({ route, navigation }) {
         />
       </View>
 
-      <Text style={styles.title}>Self Assessment</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.mainCard}>
+          <Text style={styles.heading}>
+            Coding Workload & Stress Assessment
+          </Text>
 
-      {/* CARD */}
-      <View style={styles.card}>
+          <Text style={styles.subHeading}>
+            Please rate your experience during this coding task. There are no
+            right or wrong answers.
+          </Text>
 
-        {/* Mental Load */}
-        <Text style={styles.label}>Mental Load</Text>
-        {renderScale(mentalLoad, setMentalLoad)}
-
-        {/* Frustration */}
-        <Text style={styles.label}>Frustration</Text>
-        {renderScale(frustration, setFrustration)}
-
-        {/* Effort */}
-        <Text style={styles.label}>Effort</Text>
-        {renderScale(effort, setEffort)}
-
-        {/* Comment */}
-        <Text style={styles.label}>Comment</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Write your feedback..."
-          value={comment}
-          onChangeText={setComment}
-        />
-
-        {/* SUBMIT BUTTON */}
-        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitText}>Submit</Text>
+          {/* SECTIONS */}
+          {renderSection(
+            'Mental Demand',
+            'How mentally demanding was this coding task?',
+            mentalLoad,
+            setMentalLoad,
           )}
-        </TouchableOpacity>
 
-      </View>
+          {renderSection(
+            'Effort',
+            'How much effort did you put into completing this task?',
+            effort,
+            setEffort,
+          )}
 
+          {renderSection(
+            'Frustration',
+            'How frustrated or stressed did you feel during the task?',
+            frustration,
+            setFrustration,
+          )}
+
+          {/* INPUT */}
+          <TextInput
+            style={styles.input}
+            placeholder="Type your coding experience. Your response helps us understand your coding experience."
+            placeholderTextColor="#999"
+               // ✅ ADD THIS
+            value={comment}
+            onChangeText={setComment}
+            multiline
+            
+          />
+
+          {/* BUTTON */}
+          <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitText}>Submit</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
-}const styles = StyleSheet.create({
+}
 
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    paddingTop: 40
   },
 
   header: {
-    alignItems: 'center'
-  },
-
-  back: {
-    position: 'absolute',
-    left: 15,
-    color: 'white'
-  },
-
-  logo: {
-    width: 100,
-    height: 40,
-    resizeMode: 'contain'
-  },
-
-  title: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 20
-  },
-
-  card: {
-    backgroundColor: '#fff',
-    margin: 20,
-    borderRadius: 20,
-    padding: 20
-  },
-
-  label: {
-    marginTop: 15,
-    fontWeight: 'bold',
-    color: '#48D1E4'
-  },
-
-  scaleRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 10
+    
   },
 
-  scaleBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 5,
-    backgroundColor: '#eee',
-    margin: 3,
-    justifyContent: 'center',
-    alignItems: 'center'
+   back: {
+    margin: 20, 
+    color: 'white',
+    fontSize: 16,
   },
 
-  activeBtn: {
-    backgroundColor: '#48D1E4'
+   logo: {
+    width: 70,
+    height: 70,
+    resizeMode: 'contain',
+    marginLeft: '65',
   },
 
-  scaleText: {
-    fontSize: 12
+
+  mainCard: {
+    backgroundColor: '#dff6f8',
+    margin: 15,
+    borderRadius: 20,
+    padding: 15,
+  },
+
+  heading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#48D1E4',
+  },
+
+  subHeading: {
+    fontSize: 14,
+    color: '#48D1E4',
+    marginBottom: 10,
+  },
+
+  section: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 15,
+    padding: 12,
+    marginTop: 10,
+  },
+
+  sectionTitle: {
+    color: '#48D1E4',
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+
+  question: {
+    fontSize: 16,
+    color: '#48D1E4',
+    fontWeight: 'bold',
+  },
+
+  questionText: {
+    fontSize: 15,
+    marginBottom: 5,
+  },
+
+  helper: {
+    fontSize: 14 ,
+    color: '#48D1E4',
+    fontWeight: 'bold',
+  },
+
+  helperText: {
+    fontSize: 14 ,
+    marginBottom: 10,
+  },
+
+  emojiRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  emoji: {
+    fontSize: 18,
+    opacity: 0.2,
+  },
+
+  activeEmoji: {
+    opacity: 1,
+  },
+
+  colorBar: {
+    flexDirection: 'row',
+    marginTop: 5,
+  },
+
+  bar: {
+    flex: 1,
+    height: 5,
   },
 
   input: {
-    marginTop: 10,
-    backgroundColor: '#f2f2f2',
+    marginTop: 15,
+    backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 10
+    padding: 10,
+    width: '100%',
+    height: 110,
+    textAlignVertical: 'top', // ✅ better UX
   },
 
   submitBtn: {
-    marginTop: 20,
+    marginTop: 15,
     backgroundColor: '#48D1E4',
     padding: 12,
     borderRadius: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   submitText: {
     color: '#fff',
-    fontWeight: 'bold'
-  }
-
+    fontWeight: 'bold',
+  },
 });

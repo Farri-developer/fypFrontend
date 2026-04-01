@@ -7,25 +7,24 @@ import {
   TextInput,
   Image,
   ActivityIndicator,
-  Switch
+  Switch,
 } from 'react-native';
 
-import { stopRecording } from '../../../api/sessionApi';
+import { stopRecording, resetAll } from '../../../api/sessionApi';
+import { deleteSession } from '../../../api/reportApi';
+
 
 export default function QuestionAttempt({ route, navigation }) {
-
   const params = route?.params || {};
+  const sessionid = params.sessionid || null;
   const currentQuestion = params.questions[0] || null;
   const remainingQuestions = params.questions.slice(1) || [];
 
-
   const sid = params.sid || null;
 
-  const [seconds, setSeconds] = useState(
-    (currentQuestion?.duration || 1) * 60
-  );
+  const [seconds, setSeconds] = useState((currentQuestion?.duration || 1) * 60);
 
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [chatgptEnabled, setChatgptEnabled] = useState(false);
 
@@ -66,16 +65,16 @@ export default function QuestionAttempt({ route, navigation }) {
       const data = await stopRecording(answer, chatgptEnabled);
 
       if (!data) {
-        alert("Recording stop failed");
+        alert('Recording stop failed');
         hasNavigated.current = false;
         return;
       }
 
-      navigation.replace("Endbp", {
+      navigation.replace('Endbp', {
         sid: sid,
-        questions: remainingQuestions   // 👈 pass remaining
+        questions: remainingQuestions,
+        sessionid: sessionid,
       });
-
     } catch (error) {
       console.log(error);
       hasNavigated.current = false;
@@ -84,12 +83,30 @@ export default function QuestionAttempt({ route, navigation }) {
     }
   };
 
+  const handleBack = async () => {
+    try {
+      console.log('⬅️ Back pressed - stopping stream');
+
+      // 🗑 DELETE SESSION (agar exist kare)
+      if (sessionid) {
+        await deleteSession(sessionid);
+        console.log('🗑 Session Deleted');
+      }
+
+      // ♻ RESET SYSTEM
+      await resetAll();
+
+      // 🔙 Navigate
+      navigation.replace('StudentTabs', { sid: sid });
+    } catch (error) {
+      console.log('BACK ERROR:', error);
+    }
+  };
   return (
     <View style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handleBack}>
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
 
@@ -101,34 +118,26 @@ export default function QuestionAttempt({ route, navigation }) {
 
       {/* CARD */}
       <View style={styles.card}>
-
         <View style={styles.topBox}>
           <Text style={styles.qTitle}>Question</Text>
-          
-
 
           <View style={styles.timerBox}>
-            <Text style={styles.timerText}>
-              ⏱ {formatTime()}
-            </Text>
+            <Text style={styles.timerText}>⏱ {formatTime()}</Text>
           </View>
         </View>
 
         <Text style={styles.label}>Question Statement:</Text>
         <Text style={styles.question}>
-          {currentQuestion?.description || "No Question"}
+          {currentQuestion?.description || 'No Question'}
         </Text>
-
+{/* 
         <Text style={styles.question}>
-          {currentQuestion?.qid || "No Question"}
-        </Text>
+          {currentQuestion?.qid || 'No Question'}
+        </Text> */}
 
         <View style={styles.gptRow}>
           <Text style={styles.gptText}>ChatGPT</Text>
-          <Switch
-            value={chatgptEnabled}
-            onValueChange={setChatgptEnabled}
-          />
+          <Switch value={chatgptEnabled} onValueChange={setChatgptEnabled} />
         </View>
 
         <Text style={styles.inputLabel}>Write Your Code Below</Text>
@@ -136,6 +145,8 @@ export default function QuestionAttempt({ route, navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Enter your program..."
+          placeholderTextColor="#999"
+
           multiline
           value={answer}
           onChangeText={setAnswer}
@@ -149,98 +160,93 @@ export default function QuestionAttempt({ route, navigation }) {
           )}
         </TouchableOpacity>
 
-        <Text style={styles.footer}>
-          Auto move when time ends
-        </Text>
-
+        <Text style={styles.footer}>Auto move when time ends</Text>
       </View>
-
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    paddingTop: 40
+   
   },
 
   header: {
     flexDirection: 'row',
-    justifyContent: 'center'
+    
   },
 
   back: {
-    position: 'absolute',
-    left: 15,
-    color: 'white'
+    margin: 20,
+    color: 'white',
+    fontSize: 16,
   },
 
   logo: {
-    width: 100,
-    height: 40,
-    resizeMode: 'contain'
+    width: 70,
+    height: 70,
+    resizeMode: 'contain',
+    marginLeft: '63',
   },
 
   card: {
     backgroundColor: '#fff',
     margin: 20,
     borderRadius: 25,
-    padding: 20
+    padding: 20,
   },
 
   topBox: {
     backgroundColor: '#48D1E4',
     padding: 15,
     borderRadius: 15,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   qTitle: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   timerBox: {
     marginTop: 8,
     backgroundColor: '#dff6f9',
     padding: 6,
-    borderRadius: 10
+    borderRadius: 10,
   },
 
   timerText: {
-    fontSize: 12
+    fontSize: 12,
   },
 
   label: {
     marginTop: 15,
     fontWeight: 'bold',
-    color: '#48D1E4'
+    color: '#48D1E4',
   },
 
   question: {
     marginTop: 5,
-    fontSize: 13
+    fontSize: 13,
   },
 
   gptRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 15
+    marginTop: 15,
   },
 
   gptText: {
     color: '#48D1E4',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   inputLabel: {
     marginTop: 10,
     fontWeight: 'bold',
-    color: '#48D1E4'
+    color: '#48D1E4',
   },
 
   input: {
@@ -248,7 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     borderRadius: 10,
     padding: 10,
-    height: 120
+    height: 120,
+    textAlignVertical: 'top', // ✅ better UX
   },
 
   nextBtn: {
@@ -256,19 +263,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#48D1E4',
     padding: 12,
     borderRadius: 10,
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   nextText: {
     color: '#fff',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   footer: {
     marginTop: 10,
     fontSize: 11,
     textAlign: 'center',
-    color: 'gray'
-  }
-
+    color: 'gray',
+  },
 });

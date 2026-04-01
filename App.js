@@ -18,6 +18,7 @@ import Baselinebp from './src/screens/Student/Session/Baselinebp';
 import QuestionAttempt from './src/screens/Student/Session/QuestionAttempt';
 import Endbp from './src/screens/Student/Session/Endbp';
 import SelfReport from './src/screens/Student/Session/SelfReport';
+import Report from './src/screens/Student/Session/Report';
 
 
 import AddQuestionScreen from './src/screens/Admin/QuestionScreen/AddQuestionScreen';
@@ -29,6 +30,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+
+       
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
@@ -81,6 +84,7 @@ export default function App() {
         <Stack.Screen name="QuestionAttempt" component={QuestionAttempt} />
         <Stack.Screen name="Endbp" component={Endbp} />
         <Stack.Screen name="SelfReport" component={SelfReport} />
+         <Stack.Screen name="Report" component={Report} />
 
 
 

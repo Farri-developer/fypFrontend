@@ -13,7 +13,7 @@ import { getAllSessions } from '../../api/reportApi'; // adjust path as needed
 
 export default function ReportScreen({ navigation, route }) {
 
-  const { sid, name, semester } = route.params;
+  const { sid } = route.params;
 
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);

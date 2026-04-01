@@ -1,5 +1,7 @@
 const BASE_URL = "http://192.168.100.7:5000/api";
 
+// const BASE_URL = 'http://192.168.100.12:5000/api';
+
 export const startSession = async () => {
   try {
     const response = await fetch(`${BASE_URL}/devices/start_stream`, {
@@ -216,6 +218,36 @@ export const submitSelfReport = async (
 
   } catch (error) {
     console.log("SELF REPORT ERROR:", error);
+    return null;
+  }
+};
+
+
+
+// 🔥 RESET ALL GLOBAL VARIABLES (NEW API)
+export const resetAll = async () => {
+  try {
+    const response = await fetch(`${BASE_URL}/devices/reset_all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const data = await response.json();
+
+    console.log("♻️ RESET ALL:", data);
+
+    if (!response.ok) return null;
+
+    if (data?.status === "All globals reset successfully") {
+      return data;
+    }
+
+    return null;
+
+  } catch (error) {
+    console.log("RESET ERROR:", error);
     return null;
   }
 };

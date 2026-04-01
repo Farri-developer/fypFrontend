@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart } from 'react-native-chart-kit';
+import { CommonActions } from '@react-navigation/native';
 
 import {
   View,
@@ -11,18 +12,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-import {
-  getStudentSessionReport,
-  getEEGData
-} from '../../../api/reportApi';
+import { getStudentSessionReport, getEEGData } from '../../../api/reportApi';
 
-export default function StudentSessionReport({ navigation, route }) {
+export default function Report({ navigation, route }) {
   const { sessionId, studentId } = route.params;
 
   const [report, setReport] = useState(null);
   const [eeg, setEeg] = useState(null);
 
-  const [loading, setLoading] = useState(true);       // main data
+  const [loading, setLoading] = useState(true); // main data
   const [graphLoading, setGraphLoading] = useState(true); // graph
 
   useEffect(() => {
@@ -39,7 +37,6 @@ export default function StudentSessionReport({ navigation, route }) {
       // ✅ STEP 2: GRAPH LOAD (slow)
       const eegData = await getEEGData(studentId, sessionId);
       setEeg(eegData);
-
     } catch (error) {
       console.log('ERROR:', error);
     } finally {
@@ -58,10 +55,24 @@ export default function StudentSessionReport({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'StudentTabs',
+                    params: { sid: studentId },
+                  },
+                ],
+              }),
+            )
+          }
+          style={styles.backBtn}
+        >
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
 
@@ -100,7 +111,6 @@ export default function StudentSessionReport({ navigation, route }) {
           <ActivityIndicator size="small" color="#000" />
         ) : eeg?.alpha?.length > 0 ? (
           (() => {
-
             const time = eeg.time || [];
             const alpha = eeg.alpha || [];
             const beta = eeg.beta || [];
@@ -112,7 +122,7 @@ export default function StudentSessionReport({ navigation, route }) {
               alpha.length,
               beta.length,
               theta.length,
-              gamma.length
+              gamma.length,
             );
 
             const safeTime = time.slice(0, minLength);
@@ -122,7 +132,7 @@ export default function StudentSessionReport({ navigation, route }) {
             const safeGamma = gamma.slice(0, minLength);
 
             const labels = safeTime.map((t, i) =>
-              i % 20 === 0 ? `${t}s` : ''
+              i % 20 === 0 ? `${t}s` : '',
             );
 
             return (
@@ -158,7 +168,6 @@ export default function StudentSessionReport({ navigation, route }) {
                 />
               </ScrollView>
             );
-
           })()
         ) : (
           <Text style={styles.noData}>No Graph Data</Text>
@@ -197,13 +206,11 @@ export default function StudentSessionReport({ navigation, route }) {
           <Text style={styles.noData}>No Data Exist</Text>
         )}
       </View>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
@@ -213,11 +220,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#48D1E4'
+    backgroundColor: '#48D1E4',
   },
 
   header: {
-    marginTop: 20,
     alignItems: 'center',
   },
 
@@ -306,6 +312,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'gray',
     marginTop: 10,
-  }
-
+  },
 });

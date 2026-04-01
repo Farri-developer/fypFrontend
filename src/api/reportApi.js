@@ -1,6 +1,7 @@
 
 
 const BASE_URL = "http://192.168.100.7:5000/api";
+// const BASE_URL = 'http://192.168.100.12:5000/api';
 
 
 
@@ -226,7 +227,7 @@ export const getAllQuestions = async (sid) => {
     res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
     
     data = await res.json();
-    if (data?.count > 0) questions.push(data);
+    // if (data?.count > 0) questions.push(data);
 
     console.log("API DATA:", questions); // 🔥 debug
 
@@ -235,5 +236,34 @@ export const getAllQuestions = async (sid) => {
   } catch (error) {
     console.log("API ERROR:", error);
     return [];
+  }
+};
+
+
+
+// 🔥 DELETE SESSION
+export const deleteSession = async (sessionId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/report/delete_session/${sessionId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("🗑 DELETE SESSION:", data);
+
+    if (!response.ok) return null;
+
+    return data;
+
+  } catch (error) {
+    console.log("DELETE SESSION ERROR:", error);
+    return null;
   }
 };

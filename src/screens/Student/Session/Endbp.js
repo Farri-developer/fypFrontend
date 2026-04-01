@@ -11,15 +11,19 @@ import {
 import {
   afterQuestionBP,
   stopStream,
-  startRecording   // ✅ FIXED NAME
+  startRecording,
+  resetAll, // ✅ FIXED NAME
 } from '../../../api/sessionApi';
 
-export default function Endbp({ route, navigation }) {
+import { deleteSession } from '../../../api/reportApi';
 
+
+export default function Endbp({ route, navigation }) {
   const params = route?.params || {};
 
   const sid = params.sid || null;
   const questions = params.questions || [];
+  const sessionid = params.sessionid || null;
 
   const [loading, setLoading] = useState(false);
   const [bpData, setBpData] = useState(null);
@@ -39,9 +43,8 @@ export default function Endbp({ route, navigation }) {
       } else {
         alert('Failed to get BP');
       }
-
     } catch (error) {
-      console.log("BP ERROR:", error);
+      console.log('BP ERROR:', error);
     } finally {
       setLoading(false);
     }
@@ -54,22 +57,19 @@ export default function Endbp({ route, navigation }) {
     try {
       setFinishing(true);
 
-      console.log("NEXT CLICKED");
-      console.log("Remaining Questions:", questions);
+      console.log('NEXT CLICKED');
+      console.log('Remaining Questions:', questions);
 
       // 🔁 CASE 1: QUESTIONS AVAILABLE
       if (questions.length > 0) {
-
         const nextQuestion = questions[0];
-         
 
-        console.log("START RECORDING:", nextQuestion?.qid, sid);
+        console.log('START RECORDING:', nextQuestion?.qid, sid);
 
         // ✅ START RECORDING WITH qid + sid
         const startRes = await startRecording(
           sid,
-          nextQuestion?.qid // ✅ FIXED: qid is now an array
-          
+          nextQuestion?.qid, // ✅ FIXED: qid is now an array
         );
 
         if (!startRes) {
@@ -88,7 +88,7 @@ export default function Endbp({ route, navigation }) {
       }
 
       // 🛑 CASE 2: NO QUESTIONS → STOP STREAM
-      console.log("NO QUESTIONS → STOP STREAM");
+      console.log('NO QUESTIONS → STOP STREAM');
 
       const stopRes = await stopStream();
 
@@ -102,19 +102,37 @@ export default function Endbp({ route, navigation }) {
       navigation.replace('SelfReport', {
         sid: sid,
       });
-
     } catch (error) {
-      console.log("NEXT ERROR:", error);
+      console.log('NEXT ERROR:', error);
       setFinishing(false);
+    }
+  };
+
+  const handleBack = async () => {
+    try {
+      console.log('⬅️ Back pressed - stopping stream');
+
+      // 🗑 DELETE SESSION (agar exist kare)
+      if (sessionid) {
+        await deleteSession(sessionid);
+        console.log('🗑 Session Deleted');
+      }
+
+      // ♻ RESET SYSTEM
+      await resetAll();
+
+      // 🔙 Navigate
+      navigation.replace('StudentTabs', { sid: sid });
+    } catch (error) {
+      console.log('BACK ERROR:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handleBack}>
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
 
@@ -124,16 +142,18 @@ export default function Endbp({ route, navigation }) {
         />
       </View>
 
-      {/* TITLE */}
-      <Text style={styles.title}>After Question BP</Text>
-      <Text style={styles.title}>Session ID: {sid}</Text>
-      <Text style={styles.title}>Questions: {questions.length}</Text>
+      
 
       {/* IMAGE */}
       <Image
         source={require('../../../../assets/icons/Cuff Icon.jpg')}
         style={styles.bpImage}
       />
+
+      {/* TITLE */}
+      <Text style={styles.title}>After Question BP</Text>
+      
+      <Text style={[styles.title, { fontSize: 16 }] }>Remaining Questions: {questions.length}</Text>
 
       {/* CARD */}
       <View style={styles.card}>
@@ -166,9 +186,7 @@ export default function Endbp({ route, navigation }) {
           Pulse: {bpData ? bpData.PULSE : '___'} bpm
         </Text>
 
-        <Text style={styles.resultText}>
-          Session ID: {bpData ? bpData.SESSIONID : '___'}
-        </Text>
+       
       </View>
 
       {/* NEXT BUTTON */}
@@ -177,7 +195,7 @@ export default function Endbp({ route, navigation }) {
           styles.nextBtn,
           {
             opacity: bpData ? 1 : 0.5,
-            backgroundColor: bpData ? '#48D1E4' : '#ccc',
+            backgroundColor: bpData ? '#ffffff' : '#f4f7f8',
           },
         ]}
         disabled={!bpData || finishing}
@@ -189,41 +207,43 @@ export default function Endbp({ route, navigation }) {
           <Text style={styles.nextText}>Next</Text>
         )}
       </TouchableOpacity>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
     alignItems: 'center',
-    paddingTop: 40,
+    
   },
 
   header: {
     width: '100%',
-    alignItems: 'center',
+    flexDirection: 'row',
+    
   },
 
   back: {
-    position: 'absolute',
+    
     left: 15,
     color: 'white',
+    fontSize: 16,
+    marginTop: 25,
   },
 
   logo: {
-    width: 100,
-    height: 40,
+    width: 70,
+    height: 70,
     resizeMode: 'contain',
+    marginLeft: 102,
   },
 
   title: {
     color: 'white',
     fontSize: 20,
-    marginTop: 20,
+    marginTop: 10,
     fontWeight: 'bold',
   },
 
@@ -235,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#eee',
+    backgroundColor: '#ffffff',
     padding: 15,
     borderRadius: 15,
     marginTop: 20,
@@ -260,7 +280,7 @@ const styles = StyleSheet.create({
   },
 
   resultCard: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#ffffff',
     padding: 15,
     borderRadius: 15,
     marginTop: 15,
@@ -286,7 +306,6 @@ const styles = StyleSheet.create({
 
   nextText: {
     fontWeight: 'bold',
-    color: 'white',
-  }
-
+    color: '#48D1E4',
+  },
 });

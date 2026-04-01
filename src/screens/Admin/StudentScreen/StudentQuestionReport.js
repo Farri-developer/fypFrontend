@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
 
   back: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     
   },
 

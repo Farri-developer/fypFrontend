@@ -8,19 +8,30 @@ import {
   ScrollView,
 } from 'react-native';
 
-import { getTopSessions } from '../../api/reportApi'; // adjust path
+import { getTopSessions } from '../../api/reportApi';
+import { getStudentById } from '../../api/studentApi';
 
 export default function HomeScreen({ navigation, route }) {
-  const { sid, name, semester } = route.params;
+  const { sid } = route.params;
   const [sessions, setSessions] = useState([]);
+  const [student, setStudent] = useState(null);
 
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
-    const data = await getTopSessions(sid);
-    setSessions(data);
+    try {
+      // ✅ Student data fetch
+      const studentData = await getStudentById(sid);
+      setStudent(studentData);
+
+      // ✅ Sessions fetch (same as before)
+      const sessionData = await getTopSessions(sid);
+      setSessions(sessionData);
+    } catch (error) {
+      console.log('ERROR:', error);
+    }
   };
 
   return (
@@ -47,8 +58,9 @@ export default function HomeScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.hello}>Hello {name}!</Text>
-      <Text style={styles.semester}>Semester {semester}</Text>
+      <Text style={styles.hello}>Welcome! {student?.name || 'Loading...'}!</Text>
+
+      <Text style={styles.semester}>Semester {student?.semester || '--'}</Text>
 
       {/* CARD */}
       <View style={styles.dashboard}>
@@ -144,7 +156,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    paddingLeft: 15,  
+    paddingLeft: 15,
     paddingRight: 15,
   },
 
@@ -167,7 +179,7 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     resizeMode: 'contain',
-    marginRight: 19 ,
+    marginRight: 19,
   },
 
   hello: {

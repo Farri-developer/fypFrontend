@@ -5,13 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
-import { startBaselineBP, startRecording } from '../../../api/sessionApi';
+import {
+  startBaselineBP,
+  startRecording,
+  resetAll,
+} from '../../../api/sessionApi';
 
 export default function Baselinebp({ route, navigation }) {
-
   const { sid, questions } = route.params;
 
   const [loading, setLoading] = useState(false);
@@ -28,9 +31,8 @@ export default function Baselinebp({ route, navigation }) {
       if (data) {
         setBpData(data); // ✅ enable next button
       } else {
-        alert("Failed to get BP");
+        alert('Failed to get BP');
       }
-
     } catch (error) {
       console.log(error);
     } finally {
@@ -44,47 +46,59 @@ export default function Baselinebp({ route, navigation }) {
       setStarting(true);
 
       if (!questions || questions.length === 0) {
-        alert("No questions available");
+        alert('No questions available');
         return;
       }
-
-
-
-
 
       // ✅ first question
       const firstQuestion = questions[0];
 
-
       // 🔥 API CALL
       const data = await startRecording(sid, firstQuestion.qid);
 
-      if (data && data.status === "recording started") {
-
+      if (data && data.status === 'recording started') {
         // ✅ Navigate
-        navigation.navigate("QuestionAttempt", {
+        navigation.navigate('QuestionAttempt', {
           questions: questions,
           sid: sid,
+          sessionid: data.sessionid,
         });
-
       } else {
-        alert("Recording start failed");
+        alert('Recording start failed');
       }
-
     } catch (error) {
       console.log(error);
-      alert("Something went wrong");
+      alert('Something went wrong');
     } finally {
       setStarting(false);
     }
   };
 
+  const handleBack = async () => {
+    try {
+      console.log('⬅️ Back pressed - stopping stream');
+
+      // 🔥 STOP STREAM + RESET
+      await resetAll();
+
+      // 👇 screen wapas
+      navigation.goBack();
+    } catch (error) {
+      console.log('BACK ERROR:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-
       {/* HEADER */}
+
+
       <View style={styles.header}>
-        <Text style={styles.back}>← Back</Text>
+
+
+        <TouchableOpacity onPress={handleBack}>
+          <Text style={styles.back}>‹ Back</Text>
+        </TouchableOpacity>
 
         <Image
           source={require('../../../../assets/icons/CodeMide.png')}
@@ -103,7 +117,8 @@ export default function Baselinebp({ route, navigation }) {
       {/* CARD */}
       <View style={styles.card}>
         <Text style={styles.cardText}>
-          Please turn on the Rossmax monitoring device and wear the cuff properly on your arm before taking the reading.
+          Please turn on the Rossmax monitoring device and wear the cuff
+          properly on your arm before taking the reading.
         </Text>
 
         <TouchableOpacity style={styles.measureBtn} onPress={handleMeasure}>
@@ -138,48 +153,49 @@ export default function Baselinebp({ route, navigation }) {
           styles.nextBtn,
           {
             opacity: bpData ? 1 : 0.5,
-            backgroundColor: bpData ? '#48D1E4' : '#ccc'
-          }
+            backgroundColor: bpData ? '#ffffff' : '#f4f7f8',
+          },
         ]}
         disabled={!bpData || starting}
         onPress={handleNext}
       >
         {starting ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color="#ffffff" />
         ) : (
           <Text style={styles.nextText}>Next</Text>
         )}
       </TouchableOpacity>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
     alignItems: 'center',
-    paddingTop: 40,
+    
   },
 
   header: {
     width: '100%',
     alignItems: 'center',
+    flexDirection: 'row',
   },
 
   back: {
-    position: 'absolute',
+   
     left: 15,
-    top: 0,
+    fontSize: 16,
+   
     color: 'white',
   },
 
   logo: {
-    width: 100,
-    height: 40,
-    resizeMode: 'contain',
+    width: 75,
+    height: 75,
+    marginLeft: 100, 
+
   },
 
   title: {
@@ -197,7 +213,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#eee',
+    backgroundColor: '#ffffff',
     padding: 15,
     borderRadius: 15,
     marginTop: 20,
@@ -222,7 +238,7 @@ const styles = StyleSheet.create({
   },
 
   resultCard: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#ffffff',
     padding: 15,
     borderRadius: 15,
     marginTop: 15,
@@ -244,11 +260,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '50%',
     alignItems: 'center',
+    
+
   },
 
   nextText: {
     fontWeight: 'bold',
-    color: 'white'
-  }
-
+    color: '#48D1E4',
+    
+  },
 });

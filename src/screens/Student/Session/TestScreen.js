@@ -13,7 +13,8 @@ import { getAllQuestions } from '../../../api/reportApi';
 import { startSession } from '../../../api/sessionApi';
 
 export default function TestScreen({ route, navigation }) {
-  const { sid, name, semester } = route.params;
+  // const { sid, name, semester } = route.params;
+  const {sid} = route.params;
 
   // 🔥 Separate states
   const [questions, setQuestions] = useState([]);
@@ -82,7 +83,7 @@ export default function TestScreen({ route, navigation }) {
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('Home')}
         >
           <Text style={styles.backText}>‹ Back</Text>
         </TouchableOpacity>
@@ -114,15 +115,15 @@ export default function TestScreen({ route, navigation }) {
 
             <Text style={styles.duration}>Duration: {q.duration} minutes</Text>
 
-             <Text style={styles.duration}>qid: {q.qid} minutes</Text> 
+             {/* <Text style={styles.duration}>qid: {q.qid} </Text>  */}
           </View>
         ))}
 
         {/* NOTES */}
-        <Text style={styles.note}>
+        {/* <Text style={styles.note}>
           Your focus level, stress, and heart rate signals will be recorded
           during the test.
-        </Text>
+        </Text> */}
 
         <Text style={styles.warning}>
           Please turn ON the monitoring device before starting the test.

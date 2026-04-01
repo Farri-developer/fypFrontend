@@ -12,8 +12,8 @@ const Tab = createBottomTabNavigator();
 export default function StudentTabs({ route }) {
 
   const sid = route.params?.sid || null;
-  const name = route.params?.name || null;
-  const semester = route.params?.semester || null;
+  // const name = route.params?.name || null;
+  // const semester = route.params?.semester || null;
 
   return (
     <Tab.Navigator
@@ -57,10 +57,10 @@ export default function StudentTabs({ route }) {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} initialParams={{ sid, name, semester }} />
-      <Tab.Screen name="Test" component={TestScreen} initialParams={{ sid, name, semester }} />
-      <Tab.Screen name="Report" component={ReportScreen} initialParams={{ sid, name, semester }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ sid, name, semester }} />
+      <Tab.Screen name="Home" component={HomeScreen} initialParams={{ sid}} />
+      <Tab.Screen name="Test" component={TestScreen} initialParams={{ sid }} />
+      <Tab.Screen name="Report" component={ReportScreen} initialParams={{ sid }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} initialParams={{ sid }} />
     </Tab.Navigator>
   );
 }
