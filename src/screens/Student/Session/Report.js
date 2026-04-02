@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 
 import { getStudentSessionReport, getEEGData } from '../../../api/reportApi';
@@ -101,83 +102,108 @@ export default function Report({ navigation, route }) {
         <Text>HR: {report?.HR || '-'}</Text>
         <Text>RMSSD: {report?.RMSSD || '-'}</Text>
         <Text>SDNN: {report?.SDNN || '-'}</Text>
+
+        <Text>pNN50: {report?.pNN50 || '-'}</Text>
+
+        <Text style={styles.note}>
+          Higher RMSSD and SDNN indicate better relaxation.
+        </Text>
       </View>
 
       {/* GRAPH */}
       <View style={styles.card}>
-        <Text style={styles.heading}>Physiological Signals During Session</Text>
+              <Text style={styles.heading}>Physiological Signals During Session</Text>
+      
+              {graphLoading ? (
+                <ActivityIndicator size="small" color="#000" />
+              ) : eeg?.alpha?.length > 0 ? (
+                (() => {
+                  const screenWidth = Dimensions.get('window').width;
+      
+                  const clean = arr =>
+                    arr.map(v => (isNaN(v) || v === null ? 0 : Number(v)));
+      
+                  const time = eeg.time || [];
+                  const alpha = eeg.alpha || [];
+                  const beta = eeg.beta || [];
+                  const theta = eeg.theta || [];
+                  const gamma = eeg.gamma || [];
+      
+                  const minLength = Math.min(
+                    time.length,
+                    alpha.length,
+                    beta.length,
+                    theta.length,
+                    gamma.length,
+                  );
+      
+                  const safeTime = time.slice(0, minLength);
+                  const safeAlpha = clean(alpha.slice(0, minLength));
+                  const safeBeta = clean(beta.slice(0, minLength));
+                  const safeTheta = clean(theta.slice(0, minLength));
+                  const safeGamma = clean(gamma.slice(0, minLength));
+      
+                  // 🔥 Reduce data (important for fitting screen)
+                  const reduce = (arr, step = 5) =>
+                    arr.filter((_, i) => i % step === 0);
+      
+                  const finalTime = reduce(safeTime);
+                  const finalAlpha = reduce(safeAlpha);
+                  const finalBeta = reduce(safeBeta);
+                  const finalTheta = reduce(safeTheta);
+                  const finalGamma = reduce(safeGamma);
+      
+                  const step = Math.ceil(finalTime.length / 8);
+      
+                  const labels = finalTime.map((t, i) =>
+                    i % step === 0 ? `${Math.round(t)}s` : '',
+                  );
+      
+                  return (
+                    <LineChart
+                      data={{
+                        labels: labels,
+                        datasets: [
+                          { data: finalAlpha, color: () => '#3CBAC8' },
+                          { data: finalBeta, color: () => '#FF6B6B' },
+                          { data: finalTheta, color: () => '#FFD93D' },
+                          { data: finalGamma, color: () => '#6BCB77' },
+                        ],
+                        legend: ['Alpha', 'Beta', 'Theta', 'Gamma'],
+                      }}
+                      width={screenWidth - 40} // ✅ FULL WIDTH (NO SCROLL)
+                      height={260}
+                      withDots={false}
+                      chartConfig={{
+                        backgroundColor: '#fff',
+                        backgroundGradientFrom: '#fff',
+                        backgroundGradientTo: '#fff',
+                        decimalPlaces: 2,
+                        color: () => '#000',
+                        labelColor: () => '#000',
+                       
+                        propsForBackgroundLines: {
+                          stroke: '#ccc',
+                          strokeDasharray: '5,5',
+                        },
+                      }}
+                      bezier={false} // ✅ stable graph
+                        style={{ borderRadius: 10, marginTop: 10 ,marginLeft:-15 }}
+                    />
+                  );
+                })()
+              ) : (
+                <Text style={styles.noData}>No Graph Data</Text>
+              )}
+      
+              <Text style={{ marginTop: 10 }}>EEG Band Power Summary:</Text>
+              <Text>Alpha → Relaxation</Text>
+              <Text>Beta → Focus / Stress</Text>
+              <Text>Theta → Mental Workload</Text>
+            </View>
+            
 
-        {graphLoading ? (
-          <ActivityIndicator size="small" color="#000" />
-        ) : eeg?.alpha?.length > 0 ? (
-          (() => {
-            const time = eeg.time || [];
-            const alpha = eeg.alpha || [];
-            const beta = eeg.beta || [];
-            const theta = eeg.theta || [];
-            const gamma = eeg.gamma || [];
 
-            const minLength = Math.min(
-              time.length,
-              alpha.length,
-              beta.length,
-              theta.length,
-              gamma.length,
-            );
-
-            const safeTime = time.slice(0, minLength);
-            const safeAlpha = alpha.slice(0, minLength);
-            const safeBeta = beta.slice(0, minLength);
-            const safeTheta = theta.slice(0, minLength);
-            const safeGamma = gamma.slice(0, minLength);
-
-            const labels = safeTime.map((t, i) =>
-              i % 20 === 0 ? `${t}s` : '',
-            );
-
-            return (
-              <ScrollView horizontal>
-                <LineChart
-                  data={{
-                    labels: labels,
-                    datasets: [
-                      { data: safeAlpha, color: () => '#3CBAC8' },
-                      { data: safeBeta, color: () => '#FF6B6B' },
-                      { data: safeTheta, color: () => '#FFD93D' },
-                      { data: safeGamma, color: () => '#6BCB77' },
-                    ],
-                    legend: ['Alpha', 'Beta', 'Theta', 'Gamma'],
-                  }}
-                  width={Math.max(safeTime.length * 8, 1000)}
-                  height={260}
-                  withDots={false}
-                  chartConfig={{
-                    backgroundColor: '#fff',
-                    backgroundGradientFrom: '#fff',
-                    backgroundGradientTo: '#fff',
-                    decimalPlaces: 2,
-                    color: () => '#000',
-                    labelColor: () => '#000',
-                    propsForBackgroundLines: {
-                      stroke: '#ccc',
-                      strokeDasharray: '5,5',
-                    },
-                  }}
-                  bezier
-                  style={{ borderRadius: 10, marginTop: 10 }}
-                />
-              </ScrollView>
-            );
-          })()
-        ) : (
-          <Text style={styles.noData}>No Graph Data</Text>
-        )}
-
-        <Text style={{ marginTop: 10 }}>EEG Band Power Summary:</Text>
-        <Text>Alpha → Relaxation</Text>
-        <Text>Beta → Focus / Stress</Text>
-        <Text>Theta → Mental Workload</Text>
-      </View>
 
       {/* QUESTIONS */}
       <View style={styles.reportSection}>
@@ -313,4 +339,9 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginTop: 10,
   },
+   note: {
+    marginTop: 8,
+    fontSize: 12,
+    color: 'gray'
+  }
 });

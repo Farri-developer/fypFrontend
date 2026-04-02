@@ -119,7 +119,7 @@ export default function AdminScreen({ navigation }) {
         Q{index + 1}: {item.description}{' '}
       </Text>
 
-      <View style={{ flexDirection: 'row' ,paddingLeft: 5}}>
+      <View style={{ flexDirection: 'row', paddingLeft: 5 }}>
         <Text style={styles.qText}>Level: {item.questionlevel} |</Text>
         <Text style={styles.qText}>Total Attempts: {item.count} </Text>
       </View>
@@ -181,7 +181,7 @@ export default function AdminScreen({ navigation }) {
         >
           <Text style={styles.studentBtnText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.studentBtn}
           onPress={() => handleDeleteStudent(item.sid)}
         >
@@ -196,7 +196,12 @@ export default function AdminScreen({ navigation }) {
       {/* Logout */}
       <TouchableOpacity
         style={styles.logoutBtn}
-        onPress={() => navigation.goBack()}
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          })
+        }
       >
         <Text style={styles.logoutText}>‹ Logout</Text>
       </TouchableOpacity>
@@ -330,7 +335,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   qTitle: { color: '#fff', fontWeight: '700', marginBottom: 5, fontSize: 15 },
-  qText: { color: '#eafcff', fontSize: 14, fontWeight: '600' ,paddingLeft: 10},
+  qText: { color: '#eafcff', fontSize: 14, fontWeight: '600', paddingLeft: 10 },
   btnRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
   smallBtn: {
     backgroundColor: '#fff',

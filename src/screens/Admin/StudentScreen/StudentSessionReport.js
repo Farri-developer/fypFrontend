@@ -9,12 +9,10 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 
-import {
-  getStudentSessionReport,
-  getEEGData
-} from '../../../api/reportApi';
+import { getStudentSessionReport, getEEGData } from '../../../api/reportApi';
 
 export default function StudentSessionReport({ navigation, route }) {
   const { sessionId, studentId } = route.params;
@@ -22,7 +20,7 @@ export default function StudentSessionReport({ navigation, route }) {
   const [report, setReport] = useState(null);
   const [eeg, setEeg] = useState(null);
 
-  const [loading, setLoading] = useState(true);       // main data
+  const [loading, setLoading] = useState(true); // main data
   const [graphLoading, setGraphLoading] = useState(true); // graph
 
   useEffect(() => {
@@ -39,7 +37,6 @@ export default function StudentSessionReport({ navigation, route }) {
       // ✅ STEP 2: GRAPH LOAD (slow)
       const eegData = await getEEGData(studentId, sessionId);
       setEeg(eegData);
-
     } catch (error) {
       console.log('ERROR:', error);
     } finally {
@@ -58,10 +55,12 @@ export default function StudentSessionReport({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container}>
-
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
 
@@ -90,6 +89,11 @@ export default function StudentSessionReport({ navigation, route }) {
         <Text>HR: {report?.HR || '-'}</Text>
         <Text>RMSSD: {report?.RMSSD || '-'}</Text>
         <Text>SDNN: {report?.SDNN || '-'}</Text>
+        <Text>pNN50: {report?.pNN50 || '-'}</Text>
+
+        <Text style={styles.note}>
+          Higher RMSSD and SDNN indicate better relaxation.
+        </Text>
       </View>
 
       {/* GRAPH */}
@@ -100,6 +104,10 @@ export default function StudentSessionReport({ navigation, route }) {
           <ActivityIndicator size="small" color="#000" />
         ) : eeg?.alpha?.length > 0 ? (
           (() => {
+            const screenWidth = Dimensions.get('window').width;
+
+            const clean = arr =>
+              arr.map(v => (isNaN(v) || v === null ? 0 : Number(v)));
 
             const time = eeg.time || [];
             const alpha = eeg.alpha || [];
@@ -112,53 +120,63 @@ export default function StudentSessionReport({ navigation, route }) {
               alpha.length,
               beta.length,
               theta.length,
-              gamma.length
+              gamma.length,
             );
 
             const safeTime = time.slice(0, minLength);
-            const safeAlpha = alpha.slice(0, minLength);
-            const safeBeta = beta.slice(0, minLength);
-            const safeTheta = theta.slice(0, minLength);
-            const safeGamma = gamma.slice(0, minLength);
+            const safeAlpha = clean(alpha.slice(0, minLength));
+            const safeBeta = clean(beta.slice(0, minLength));
+            const safeTheta = clean(theta.slice(0, minLength));
+            const safeGamma = clean(gamma.slice(0, minLength));
 
-            const labels = safeTime.map((t, i) =>
-              i % 20 === 0 ? `${t}s` : ''
+            // 🔥 Reduce data (important for fitting screen)
+            const reduce = (arr, step = 5) =>
+              arr.filter((_, i) => i % step === 0);
+
+            const finalTime = reduce(safeTime);
+            const finalAlpha = reduce(safeAlpha);
+            const finalBeta = reduce(safeBeta);
+            const finalTheta = reduce(safeTheta);
+            const finalGamma = reduce(safeGamma);
+
+            const step = Math.ceil(finalTime.length / 8);
+
+            const labels = finalTime.map((t, i) =>
+              i % step === 0 ? `${Math.round(t)}s` : '',
             );
 
             return (
-              <ScrollView horizontal>
-                <LineChart
-                  data={{
-                    labels: labels,
-                    datasets: [
-                      { data: safeAlpha, color: () => '#3CBAC8' },
-                      { data: safeBeta, color: () => '#FF6B6B' },
-                      { data: safeTheta, color: () => '#FFD93D' },
-                      { data: safeGamma, color: () => '#6BCB77' },
-                    ],
-                    legend: ['Alpha', 'Beta', 'Theta', 'Gamma'],
-                  }}
-                  width={Math.max(safeTime.length * 8, 1000)}
-                  height={260}
-                  withDots={false}
-                  chartConfig={{
-                    backgroundColor: '#fff',
-                    backgroundGradientFrom: '#fff',
-                    backgroundGradientTo: '#fff',
-                    decimalPlaces: 2,
-                    color: () => '#000',
-                    labelColor: () => '#000',
-                    propsForBackgroundLines: {
-                      stroke: '#ccc',
-                      strokeDasharray: '5,5',
-                    },
-                  }}
-                  bezier
-                  style={{ borderRadius: 10, marginTop: 10 }}
-                />
-              </ScrollView>
+              <LineChart
+                data={{
+                  labels: labels,
+                  datasets: [
+                    { data: finalAlpha, color: () => '#3CBAC8' },
+                    { data: finalBeta, color: () => '#FF6B6B' },
+                    { data: finalTheta, color: () => '#FFD93D' },
+                    { data: finalGamma, color: () => '#6BCB77' },
+                  ],
+                  legend: ['Alpha', 'Beta', 'Theta', 'Gamma'],
+                }}
+                width={screenWidth - 40} // ✅ FULL WIDTH (NO SCROLL)
+                height={260}
+                withDots={false}
+                chartConfig={{
+                  backgroundColor: '#fff',
+                  backgroundGradientFrom: '#fff',
+                  backgroundGradientTo: '#fff',
+                  decimalPlaces: 2,
+                  color: () => '#000',
+                  labelColor: () => '#000',
+                 
+                  propsForBackgroundLines: {
+                    stroke: '#ccc',
+                    strokeDasharray: '5,5',
+                  },
+                }}
+                bezier={false} // ✅ stable graph
+                  style={{ borderRadius: 10, marginTop: 10 ,marginLeft:-15 }}
+              />
             );
-
           })()
         ) : (
           <Text style={styles.noData}>No Graph Data</Text>
@@ -169,7 +187,6 @@ export default function StudentSessionReport({ navigation, route }) {
         <Text>Beta → Focus / Stress</Text>
         <Text>Theta → Mental Workload</Text>
       </View>
-
       {/* QUESTIONS */}
       <View style={styles.reportSection}>
         <Text style={styles.reportTitle}>Reports of Each Question</Text>
@@ -197,13 +214,11 @@ export default function StudentSessionReport({ navigation, route }) {
           <Text style={styles.noData}>No Data Exist</Text>
         )}
       </View>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
@@ -213,7 +228,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#48D1E4'
+    backgroundColor: '#48D1E4',
   },
 
   header: {
@@ -306,6 +321,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'gray',
     marginTop: 10,
-  }
-
+  },
+  note: {
+    marginTop: 8,
+    fontSize: 12,
+    color: 'gray',
+  },
 });

@@ -84,24 +84,34 @@ export default function QuestionAttempt({ route, navigation }) {
   };
 
   const handleBack = async () => {
-    try {
-      console.log('⬅️ Back pressed - stopping stream');
+  try {
+    console.log('⬅️ Back pressed - stopping stream');
 
-      // 🗑 DELETE SESSION (agar exist kare)
-      if (sessionid) {
-        await deleteSession(sessionid);
-        console.log('🗑 Session Deleted');
-      }
-
-      // ♻ RESET SYSTEM
-      await resetAll();
-
-      // 🔙 Navigate
-      navigation.replace('StudentTabs', { sid: sid });
-    } catch (error) {
-      console.log('BACK ERROR:', error);
+    // 🗑 DELETE SESSION
+    if (sessionid) {
+      await deleteSession(sessionid);
+      console.log('🗑 Session Deleted');
     }
-  };
+
+    // ♻ RESET SYSTEM
+    await resetAll();
+
+    // 🔥 STACK RESET + NAVIGATE
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'StudentTabs',
+          params: { sid: sid },
+        },
+      ],
+    });
+
+  } catch (error) {
+    console.log('BACK ERROR:', error);
+  }
+};
+
   return (
     <View style={styles.container}>
       {/* HEADER */}
@@ -119,7 +129,7 @@ export default function QuestionAttempt({ route, navigation }) {
       {/* CARD */}
       <View style={styles.card}>
         <View style={styles.topBox}>
-          <Text style={styles.qTitle}>Question</Text>
+          <Text style={styles.qTitle}>Question Attempt</Text>
 
           <View style={styles.timerBox}>
             <Text style={styles.timerText}>⏱ {formatTime()}</Text>

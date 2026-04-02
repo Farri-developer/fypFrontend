@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
 import { LineChart } from 'react-native-chart-kit';
@@ -18,13 +18,12 @@ import {
   getEEGTheta,
   getEEGAlpha,
   getEEGBeta,
-  getEEGGamma
+  getEEGGamma,
 } from '../../../api/reportApi';
 
-const screenWidth = Dimensions.get("window").width;
+const screenWidth = Dimensions.get('window').width;
 
 export default function StudentQuestionReport({ navigation, route }) {
-
   const { sid, sessionId, qid } = route.params;
 
   const [question, setQuestion] = useState(null);
@@ -51,9 +50,8 @@ export default function StudentQuestionReport({ navigation, route }) {
       const gamma = await getEEGGamma(sid, sessionId, qid);
 
       setEeg({ delta, theta, alpha, beta, gamma });
-
     } catch (err) {
-      console.log("Error:", err);
+      console.log('Error:', err);
     } finally {
       setGraphLoading(false); // graphs ready
     }
@@ -66,7 +64,7 @@ export default function StudentQuestionReport({ navigation, route }) {
     const values = data[label];
     const time = data.time;
 
-    const labels = time.map((t, i) => (i % 20 === 0 ? t.toString() : ""));
+    const labels = time.map((t, i) => (i % 20 === 0 ? t.toString() : ''));
 
     return (
       <View style={{ marginBottom: 25 }}>
@@ -79,9 +77,9 @@ export default function StudentQuestionReport({ navigation, route }) {
               {
                 data: values,
                 color: () => color,
-                strokeWidth: 2
-              }
-            ]
+                strokeWidth: 2,
+              },
+            ],
           }}
           width={screenWidth - 60}
           height={180}
@@ -90,15 +88,15 @@ export default function StudentQuestionReport({ navigation, route }) {
           withOuterLines={true}
           withShadow={false}
           chartConfig={{
-            backgroundGradientFrom: "#f9f9f9",
-            backgroundGradientTo: "#f9f9f9",
+            backgroundGradientFrom: '#f9f9f9',
+            backgroundGradientTo: '#f9f9f9',
             decimalPlaces: 2,
             color: () => color,
-            labelColor: () => "#555",
+            labelColor: () => '#555',
             propsForBackgroundLines: {
-              stroke: "#ccc",
-              strokeDasharray: "5,5"
-            }
+              stroke: '#ccc',
+              strokeDasharray: '5,5',
+            },
           }}
           bezier
           style={{ borderRadius: 10 }}
@@ -118,7 +116,6 @@ export default function StudentQuestionReport({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container}>
-
       {/* BACK */}
       <TouchableOpacity onPress={() => navigation.goBack()}>
         <Text style={styles.back}>‹ Back</Text>
@@ -135,7 +132,7 @@ export default function StudentQuestionReport({ navigation, route }) {
       {/* QUESTION */}
       <View style={styles.card}>
         <Text style={styles.question}>
-          {question?.description || "No Question Found"}
+          {question?.description || 'No Question Found'}
         </Text>
       </View>
 
@@ -143,16 +140,22 @@ export default function StudentQuestionReport({ navigation, route }) {
       <View style={styles.card}>
         <Text style={styles.heading}>Overall Stress</Text>
 
-        <Text>Final Stress Level: {question?.stress_level || "N/A"}</Text>
-        <Text>Complete time: {question?.time_taken || "0"} sec</Text>
+        <Text>Final Stress Level: {question?.stress_level || 'N/A'}</Text>
+        <Text>Complete time: {question?.time_taken || '0'} sec</Text>
 
         <Text style={styles.subHeading}>Blood Pressure (BP) Analysis</Text>
-        <Text>{question?.bp || "N/A"}</Text>
+        <Text>{question?.bp || 'N/A'}</Text>
 
         <Text style={styles.subHeading}>Heart Rate Variability (PPG)</Text>
-        <Text>HR: {question?.HR ?? "N/A"} BPM</Text>
-        <Text>RMSSD: {question?.RMSSD ?? "N/A"} ms</Text>
-        <Text>SDNN: {question?.SDNN ?? "N/A"} ms</Text>
+        <Text>HR: {question?.HR ?? 'N/A'} BPM</Text>
+        <Text>RMSSD: {question?.RMSSD ?? 'N/A'} ms</Text>
+        <Text>SDNN: {question?.SDNN ?? 'N/A'} ms</Text>
+
+        <Text style={styles.subHeading}>Answer Details </Text>
+
+        <Text>Answers: {question?.Answers ?? 'N/A'} </Text>
+
+        <Text>gptindex: {question?.gptindex === 1 ? 'Enable' : 'Disable'}</Text>
 
         <Text style={styles.note}>
           Higher RMSSD and SDNN indicate better relaxation.
@@ -167,44 +170,41 @@ export default function StudentQuestionReport({ navigation, route }) {
           <ActivityIndicator size="small" color="#000" />
         ) : (
           <>
-            {renderChart(eeg.delta, "delta", "#3b82f6")}
-            {renderChart(eeg.theta, "theta", "#10b981")}
-            {renderChart(eeg.alpha, "alpha", "#f59e0b")}
-            {renderChart(eeg.beta, "beta", "#ef4444")}
-            {renderChart(eeg.gamma, "gamma", "#8b5cf6")}
+            {renderChart(eeg.delta, 'delta', '#3b82f6')}
+            {renderChart(eeg.theta, 'theta', '#10b981')}
+            {renderChart(eeg.alpha, 'alpha', '#f59e0b')}
+            {renderChart(eeg.beta, 'beta', '#ef4444')}
+            {renderChart(eeg.gamma, 'gamma', '#8b5cf6')}
           </>
         )}
       </View>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    padding: 20
+    padding: 20,
   },
 
   loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#48D1E4'
+    backgroundColor: '#48D1E4',
   },
 
   back: {
     color: '#fff',
     fontSize: 16,
-    
   },
 
   logo: {
     width: 70,
     height: 70,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
 
   title: {
@@ -212,42 +212,41 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     marginVertical: 10,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   card: {
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 15,
-    marginVertical: 10
+    marginVertical: 10,
   },
 
   question: {
-    textAlign: 'center',
-    color: '#48D1E4',
-    fontWeight: 'bold'
+    textAlign: 'left',
+    color: '#000000',
+    
   },
 
   heading: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   subHeading: {
     marginTop: 10,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 
   chartTitle: {
     fontWeight: 'bold',
-    marginBottom: 5
+    marginBottom: 5,
   },
 
   note: {
     marginTop: 8,
     fontSize: 12,
-    color: 'gray'
-  }
-
+    color: 'gray',
+  },
 });

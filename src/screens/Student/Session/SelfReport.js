@@ -11,7 +11,11 @@ import {
 } from 'react-native';
 
 import { deleteSession } from '../../../api/reportApi';
-import { submitSelfReport, resetAll } from '../../../api/sessionApi';
+import {
+  submitSelfReport,
+  resetAll,
+  predictSession,
+} from '../../../api/sessionApi';
 
 export default function SelfReport({ route, navigation }) {
   const params = route?.params || {};
@@ -44,8 +48,21 @@ export default function SelfReport({ route, navigation }) {
         return;
       }
 
-      sessionid = data.sessionid;
+      const sessionid = data.sessionid;
+      console.log('🧾 Report Submitted, Session ID:', sessionid);
 
+      // 🔥 STEP 1: CALL PREDICT API
+      console.log('🧠 Calling Prediction before Report... after selfreport');
+      const predictRes = await predictSession(sessionid);
+
+      if (!predictRes) {
+        alert('Prediction failed');
+        return;
+      }
+
+      console.log('✅ Prediction Done:', predictRes);
+
+      // 🔥 STEP 2: NAVIGATE AFTER SUCCESS
       navigation.replace('Report', {
         sessionId: sessionid,
         studentId: sid,
@@ -56,24 +73,37 @@ export default function SelfReport({ route, navigation }) {
       setLoading(false);
     }
   };
-
   // 🔙 BACK
   const handleBack = async () => {
     try {
+      console.log('⬅️ Back pressed - stopping stream');
+
+      // 🗑 DELETE SESSION
       if (sessionid) {
         await deleteSession(sessionid);
+        console.log('🗑 Session Deleted');
       }
 
+      // ♻ RESET SYSTEM
       await resetAll();
-      navigation.navigate('Test');
+
+      // 🔥 STACK RESET + NAVIGATE
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'StudentTabs',
+            params: { sid: sid },
+          },
+        ],
+      });
     } catch (error) {
-      console.log(error);
+      console.log('BACK ERROR:', error);
     }
   };
 
   // 🎯 SECTION UI
   const renderSection = (title, question, value, setValue) => {
-
     const emojis = ['😐', '🙂', '😐', '😕', '😡'];
 
     return (
@@ -169,11 +199,10 @@ export default function SelfReport({ route, navigation }) {
             style={styles.input}
             placeholder="Type your coding experience. Your response helps us understand your coding experience."
             placeholderTextColor="#999"
-               // ✅ ADD THIS
+            // ✅ ADD THIS
             value={comment}
             onChangeText={setComment}
             multiline
-            
           />
 
           {/* BUTTON */}
@@ -198,22 +227,20 @@ const styles = StyleSheet.create({
 
   header: {
     flexDirection: 'row',
-    
   },
 
-   back: {
-    margin: 20, 
+  back: {
+    margin: 20,
     color: 'white',
     fontSize: 16,
   },
 
-   logo: {
+  logo: {
     width: 70,
     height: 70,
     resizeMode: 'contain',
     marginLeft: '65',
   },
-
 
   mainCard: {
     backgroundColor: '#dff6f8',
@@ -259,13 +286,13 @@ const styles = StyleSheet.create({
   },
 
   helper: {
-    fontSize: 14 ,
+    fontSize: 14,
     color: '#48D1E4',
     fontWeight: 'bold',
   },
 
   helperText: {
-    fontSize: 14 ,
+    fontSize: 14,
     marginBottom: 10,
   },
 
@@ -300,7 +327,7 @@ const styles = StyleSheet.create({
     padding: 10,
     width: '100%',
     height: 110,
-    textAlignVertical: 'top', // ✅ better UX
+    textAlignVertical: 'top',
   },
 
   submitBtn: {

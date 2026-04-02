@@ -251,3 +251,37 @@ export const resetAll = async () => {
     return null;
   }
 };
+
+
+// 🔥 PREDICT SESSION (AI MODEL CALL)
+export const predictSession = async (sessionid) => {
+  try {
+    console.log("🧠 Calling Predict API...  before selfreport");
+
+    const response = await fetch(
+      `${BASE_URL}/devices/Model/predict_session/${sessionid}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("✅ PREDICT RESPONSE:", data);
+
+    if (!response.ok) return null;
+
+    if (data?.message === "SUCCESS") {
+      return data;
+    }
+
+    return null;
+
+  } catch (error) {
+    console.log("❌ PREDICT ERROR:", error);
+    return null;
+  }
+};

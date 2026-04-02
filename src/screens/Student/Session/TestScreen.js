@@ -110,6 +110,7 @@ export default function TestScreen({ route, navigation }) {
         {questions.map((q, index) => (
           <View key={q.qid} style={styles.questionBox}>
             <Text style={styles.heading}>Question {index + 1}</Text>
+       
 
             <Text style={styles.text}>{q.description}</Text>
 
