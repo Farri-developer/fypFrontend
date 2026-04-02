@@ -19,6 +19,7 @@ import {
   getEEGAlpha,
   getEEGBeta,
   getEEGGamma,
+  getSelfReport,
 } from '../../../api/reportApi';
 
 const screenWidth = Dimensions.get('window').width;
@@ -30,6 +31,7 @@ export default function StudentQuestionReport({ navigation, route }) {
   const [eeg, setEeg] = useState({});
   const [loading, setLoading] = useState(true);
   const [graphLoading, setGraphLoading] = useState(true);
+  const [selfReport, setSelfReport] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -37,12 +39,14 @@ export default function StudentQuestionReport({ navigation, route }) {
 
   const loadData = async () => {
     try {
-      // ✅ STEP 1: FAST LOAD (question data)
       const q = await getStudentQuestionReport(sid, qid);
       setQuestion(q);
-      setLoading(false); // screen show ho jaye
+      setLoading(false);
 
-      // ✅ STEP 2: SLOW LOAD (graphs)
+      // 🔥 ADD THIS (SELF REPORT)
+      const self = await getSelfReport(sessionId);
+      setSelfReport(self);
+
       const delta = await getEEGDelta(sid, sessionId, qid);
       const theta = await getEEGTheta(sid, sessionId, qid);
       const alpha = await getEEGAlpha(sid, sessionId, qid);
@@ -53,7 +57,7 @@ export default function StudentQuestionReport({ navigation, route }) {
     } catch (err) {
       console.log('Error:', err);
     } finally {
-      setGraphLoading(false); // graphs ready
+      setGraphLoading(false);
     }
   };
 
@@ -103,6 +107,26 @@ export default function StudentQuestionReport({ navigation, route }) {
         />
       </View>
     );
+  };
+  // ✅ NEW: SELF REPORT API CALL
+
+  const fetchData = async () => {
+    try {
+      const res = await getStudentSessionReport(studentId, sessionId);
+      setReport(res);
+      setLoading(false);
+
+      const eegData = await getEEGData(studentId, sessionId);
+      setEeg(eegData);
+
+      // 🔥 NEW: SELF REPORT CALL
+      const self = await getSelfReport(sessionId);
+      setSelfReport(self);
+    } catch (error) {
+      console.log('ERROR:', error);
+    } finally {
+      setGraphLoading(false);
+    }
   };
 
   // ✅ LOADING SCREEN
@@ -178,6 +202,28 @@ export default function StudentQuestionReport({ navigation, route }) {
           </>
         )}
       </View>
+
+      <View style={styles.card}>
+        <Text style={styles.heading}>Self Report (User Feedback)</Text>
+
+        {selfReport ? (
+          <>
+            <Text>Mental Load: {selfReport.mentalLoad}</Text>
+            <Text>Frustration: {selfReport.frustration}</Text>
+            <Text>Effort: {selfReport.effort}</Text>
+
+            <Text style={styles.subHeading}>Comment</Text>
+            <Text>{selfReport.comment || 'No comment'}</Text>
+          </>
+        ) : (
+          <Text style={styles.noData}>No Self Report Data</Text>
+        )}
+      </View>
+
+      <View style={{ marginTop: 10  , height: 50}} >
+        
+        
+      </View>
     </ScrollView>
   );
 }
@@ -225,7 +271,6 @@ const styles = StyleSheet.create({
   question: {
     textAlign: 'left',
     color: '#000000',
-    
   },
 
   heading: {

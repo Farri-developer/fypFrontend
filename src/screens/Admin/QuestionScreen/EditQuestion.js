@@ -21,7 +21,7 @@ export default function EditQuestion({ navigation, route }) {
   const [level, setLevel] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const levels = ['Hard', 'Medium', 'Low'];
+  const levels = ['Hard', 'Medium', 'Easy'];
 
   // 🔹 Load question data
   useEffect(() => {

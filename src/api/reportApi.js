@@ -219,13 +219,13 @@ export const getAllQuestions = async (sid) => {
 
     res = await fetch(`${BASE_URL}/report/unattemptedmedium/${sid}`);
     data = await res.json();
-    // if (data?.count >= 0)
-    //    questions.push(data);
+    if (data?.count >= 0)
+       questions.push(data);
 
     res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
     data = await res.json();
-    // if (data?.count >= 0)
-    //    questions.push(data);
+    if (data?.count >= 0)
+       questions.push(data);
 
     console.log("API DATA:", questions);
 
@@ -262,6 +262,29 @@ export const deleteSession = async (sessionId) => {
 
   } catch (error) {
     console.log("DELETE SESSION ERROR:", error);
+    return null;
+  }
+};
+
+
+
+// 👉 SELF REPORT BY SESSION
+export const getSelfReport = async (sessionId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/report/selfreport/${sessionId}`
+    );
+
+    const data = await response.json();
+
+    console.log("🧠 SELF REPORT DATA:", data);
+
+    if (!response.ok) return null;
+
+    return data;
+
+  } catch (error) {
+    console.log("SELF REPORT ERROR:", error);
     return null;
   }
 };
