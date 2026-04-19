@@ -31,7 +31,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-       
+        {/* auth screens */}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
@@ -40,18 +40,9 @@ export default function App() {
           options={{ headerShown: false }}
         />
 
-        {/* auth screens */}
+        {/* Admin Screens */}
         <Stack.Screen name="Admin" component={AdminScreen} />
         <Stack.Screen name="StudentTabs" component={StudentTabs} />
-
-
-
-
-
-
-
-
-        {/* Admin Screens */}
 
         {/* Admin Question Screen  */}
         <Stack.Screen name="EditQuestion" component={EditQuestion} />
@@ -61,8 +52,6 @@ export default function App() {
         {/* Admin Student Screen  */}
         <Stack.Screen name="EditStudent" component={EditStudent} />
         <Stack.Screen name="AddStudent" component={AddStudent} />
-
-        {/* Admin Student Sessions Screen  */}
         <Stack.Screen name="StudentSession" component={StudentSession} />
 
         <Stack.Screen
@@ -70,7 +59,6 @@ export default function App() {
           component={StudentSessionReport}
 
         />
-
         <Stack.Screen
           name="StudentQuestionReport"
           component={StudentQuestionReport}
@@ -78,13 +66,13 @@ export default function App() {
 
 
 
-        {/* Student Screens */}
+        {/* Student Side Screens */}
         
         <Stack.Screen name="Baselinebp" component={Baselinebp} />
         <Stack.Screen name="QuestionAttempt" component={QuestionAttempt} />
         <Stack.Screen name="Endbp" component={Endbp} />
         <Stack.Screen name="SelfReport" component={SelfReport} />
-         <Stack.Screen name="Report" component={Report} />
+        <Stack.Screen name="Report" component={Report} />
 
 
 
