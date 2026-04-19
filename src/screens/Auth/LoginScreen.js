@@ -128,7 +128,7 @@ export default function LoginScreen({ navigation, route }) {
             <CheckBox
               value={rememberMe}
               onValueChange={setRememberMe}
-              tintColors={{ true: '#000000', false: 'gray' }} // 🔹 Checked=Blue, Unchecked=Gray
+              tintColors={{ true: '#48D1E4', false: 'gray' }} // 🔹 Checked=Blue, Unchecked=Gray
             />
             <Text style={styles.checkboxText}>Remember me</Text>
           </View>
@@ -159,7 +159,7 @@ export default function LoginScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#48D1E4',
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#000000',
+    borderColor: '#48D1E4',
     backgroundColor: '#c8c8c8',
     padding: 10,
     borderRadius: 5,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   loginBtn: {
-    backgroundColor: '#000000',
+    backgroundColor: '#48D1E4',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -234,6 +234,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: 'center',
     textDecorationLine: 'underline',
-    color: '#000000',
+    color: '#48D1E4',
   },
 });

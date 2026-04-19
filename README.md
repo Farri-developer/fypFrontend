@@ -1,97 +1,228 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+🧠 Multimodal Stress Detection System (AI + Backend + Mobile App)
 
-# Getting Started
+A **research-grade full-stack system** that combines:
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+- 🧠 EEG Signals  
+- ❤️ PPG Signals  
+- 🩺 Blood Pressure  
+- 📋 NASA-TLX (Self Report)  
 
-## Step 1: Start Metro
+to **detect human stress levels** using:
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+👉 Machine Learning + Flask APIs + React Native Mobile App
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 📌 Project Overview
 
-# OR using Yarn
-yarn start
-```
+This project provides a **complete end-to-end solution**:
 
-## Step 2: Build and run your app
+- 📡 Real-time biosignal collection  
+- 🧪 Dataset generation  
+- 🤖 Machine learning model training  
+- 🌐 Flask backend APIs  
+- 📱 Mobile app (React Native)  
+- 📊 Stress prediction & reporting  
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+---
 
-### Android
+## 🗂️ Project Structure
 
-```sh
-# Using npm
-npm run android
 
-# OR using Yarn
-yarn android
-```
+FYP Project
+│
+├── 📁 Backend (Flask)
+│ ├── app.py
+│ ├── routes/
+│ ├── database/
+│ └── Data/
+│ └── stress_model_random_forest.pkl
+│
+├── 📁 Frontend (React Native)
+│ ├── assets/
+│ ├── src/
+│ │ ├── api/
+│ │ ├── screens/
+│ │ │ ├── Admin/
+│ │ │ ├── Student/
+│ │ │ └── Auth/
+│ └── App.js
+│
+└── README.md
 
-### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+---
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## ⚙️ Technologies Used
 
-```sh
-bundle install
-```
+### 🔹 Backend
+- Flask  
+- Python  
+- SQL Server (pyodbc)  
+- NumPy / Pandas  
+- SciPy  
+- Scikit-learn  
 
-Then, and every time you update your native dependencies, run:
+### 🔹 Frontend
+- React Native  
+- React Navigation  
+- JavaScript  
 
-```sh
-bundle exec pod install
-```
+### 🔹 Hardware
+- Muse EEG Headband  
+- Bluetooth BP Device  
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## 📱 Mobile App (Frontend)
 
-# OR using Yarn
-yarn ios
-```
+The app is built using **React Native** and includes:
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### 🔐 Authentication
+- Welcome Screen  
+- Login Screen  
+- Signup Screen  
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### 👨‍💼 Admin Panel
+- Manage Questions (Add / Edit / Delete)  
+- View Reports  
+- Manage Students  
 
-## Step 3: Modify your app
+### 🎓 Student Panel
+- Start Session  
+- Attempt Questions  
+- Record EEG + PPG + BP  
+- Self Report (NASA-TLX)  
+- View Stress Reports  
 
-Now that you have successfully run the app, let's make changes!
+### 🔄 Navigation Flow
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Welcome → Login →
+├── Admin Dashboard
+└── Student Dashboard
+→ Baseline BP
+→ Question Attempt
+→ End BP
+→ Self Report
+→ Final Report
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
-## Congratulations! :tada:
+---
 
-You've successfully run and modified your React Native App. :partying_face:
+## 🧩 Backend APIs
 
-### Now what?
+### 🔹 Device APIs
+- `/start_stream`
+- `/start_recording`
+- `/stop_recording`
+- `/after_question_bp`
+- `/selfreport`
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### 🔹 EEG APIs
+- `/delta`
+- `/theta`
+- `/alpha`
+- `/beta`
+- `/gamma`
+- `/all`
 
-# Troubleshooting
+### 🔹 Model API
+- `/predict_session/<session_id>`
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### 🔹 Student APIs
+- `/student/getall`
+- `/student/insert`
+- `/student/update`
+- `/student/delete`
 
-# Learn More
+### 🔹 Question APIs
+- `/question/getall`
+- `/question/insert`
+- `/question/update`
+- `/question/delete`
 
-To learn more about React Native, take a look at the following resources:
+### 🔹 Reports APIs
+- `/report/allsession/<sid>`
+- `/report/sessiontop5/<sid>`
+- `/report/student_session_report`
+- `/report/student_question_report`
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+## 🧠 Machine Learning
+
+- Model: Random Forest  
+- Features:
+  - EEG Band Powers  
+  - HR / HRV  
+  - BP Changes  
+- Output:
+  - Stress Level (0,1,2)
+
+---
+
+## 🧠 Stress Levels
+
+| Label | Meaning |
+|------|--------|
+| 0 | Low Stress |
+| 1 | Medium Stress |
+| 2 | High Stress |
+
+---
+
+## 🚀 How to Run
+
+### 🔹 Backend Setup
+
+```bash
+pip install flask numpy pandas scipy scikit-learn joblib pyodbc bleak pylsl
+python app.py
+🔹 Frontend Setup
+npm install
+npx react-native run-android
+📊 Key Features
+✅ Real-time EEG + PPG streaming
+✅ Blood pressure integration
+✅ Machine learning prediction
+✅ REST APIs
+✅ Mobile application
+✅ Admin + Student panels
+✅ Session-based stress tracking
+🔬 Research Contribution
+Multimodal stress detection
+Combination of objective + subjective data
+Real-time AI prediction
+Full-stack implementation
+⚠️ Limitations
+Requires hardware devices
+Controlled environment needed
+Bluetooth dependency
+📌 Future Work
+Deep Learning models (LSTM / CNN)
+Cloud deployment
+Mobile notifications
+Real-time dashboard
+🎓 Final Year Project
+
+Multimodal Stress Detection System
+
+👨‍💻 Developed By: Farhan Ayub
+🏫 University: Your University Name
+📅 Year: 2026
+
+
+---
+
+🔥 Now this README is:
+- ✅ **Frontend + Backend + AI included**
+- ✅ **Professional GitHub ready**
+- ✅ **Perfect for FYP submission**
+
+---
+
+If you want next level:
+- I can add **screenshots of your app inside README**
+- Add **API testing (Postman collection)**
+- Or make **presentation slides (PPT)**

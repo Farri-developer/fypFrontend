@@ -41,7 +41,7 @@ export default function WelcomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000', // theme color
+    backgroundColor: '#48D1E4', // theme color
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   startText: {
-    color: '#000000',
+    color: '#48D1E4',
     fontSize: 16,
     fontWeight: '900',
 
