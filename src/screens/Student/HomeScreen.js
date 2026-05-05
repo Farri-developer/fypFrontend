@@ -58,7 +58,11 @@ export default function HomeScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.hello}>Welcome! {student?.name || 'Loading...'}!</Text>
+      
+
+      <Text style={styles.hello}>
+         {student?.name || 'Loading...'}!
+      </Text>
 
       <Text style={styles.semester}>Semester {student?.semester || '--'}</Text>
 
@@ -142,8 +146,16 @@ export default function HomeScreen({ navigation, route }) {
               </View>
 
               <Text style={styles.stress}>
-                Overall Stress Level: {item.stressLevel || 'Unknown'}
+                Overall Stress Level:{' '}
+                {item?.stressLevel == 0
+                  ? 'Low'
+                  : item?.stressLevel == 1
+                  ? 'Medium'
+                  : item?.stressLevel == 2
+                  ? 'High'
+                  : 'Unknown'}
               </Text>
+              
             </View>
           ))}
         </ScrollView>

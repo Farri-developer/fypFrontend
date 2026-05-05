@@ -1,8 +1,6 @@
 
-
-const BASE_URL = "http://192.168.100.7:5000/api";
-// const BASE_URL = 'http://192.168.100.12:5000/api';
-
+// const BASE_URL = 'http://192.168.32.85:5000/api';
+const BASE_URL = 'http://192.168.32.86:5000/api';
 
 
 
@@ -217,15 +215,15 @@ export const getAllQuestions = async (sid) => {
     if (data?.count >= 0)
        questions.push(data);
 
-    res = await fetch(`${BASE_URL}/report/unattemptedmedium/${sid}`);
-    data = await res.json();
-    if (data?.count >= 0)
-       questions.push(data);
+    // res = await fetch(`${BASE_URL}/report/unattemptedmedium/${sid}`);
+    // data = await res.json();
+    // if (data?.count >= 0)
+    //    questions.push(data);
 
-    res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
-    data = await res.json();
-    if (data?.count >= 0)
-       questions.push(data);
+    // res = await fetch(`${BASE_URL}/report/unattemptedhard/${sid}`);
+    // data = await res.json();
+    // if (data?.count >= 0)
+    //    questions.push(data);
 
     console.log("API DATA:", questions);
 
@@ -285,6 +283,34 @@ export const getSelfReport = async (sessionId) => {
 
   } catch (error) {
     console.log("SELF REPORT ERROR:", error);
+    return null;
+  }
+};
+
+// 👉 PPG DATA (COMBINED)
+export const getPPGAll = async (sid, sessionId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/devices/eeg/allp?sessionid=${sessionId}&sid=${sid}`
+    );
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.log("PPG API ERROR:", error);
+    return null;
+  }
+};
+// 👉 PPG DATA (single)
+export const getPPGSingle = async (sid, sessionId, qid) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/devices/eeg/single?sessionid=${sessionId}&sid=${sid}&qid=${qid}`
+    );
+    return await res.json();
+  } catch (err) {
+    console.log("PPG SINGLE ERROR:", err);
     return null;
   }
 };

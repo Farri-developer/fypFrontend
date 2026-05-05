@@ -12,7 +12,6 @@ import {
 import { getAllSessions } from '../../api/reportApi'; // adjust path as needed
 
 export default function ReportScreen({ navigation, route }) {
-
   const { sid } = route.params;
 
   const [sessions, setSessions] = useState([]);
@@ -27,7 +26,7 @@ export default function ReportScreen({ navigation, route }) {
       const data = await getAllSessions(sid);
       setSessions(data || []);
     } catch (error) {
-      console.log("Error:", error);
+      console.log('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -44,7 +43,6 @@ export default function ReportScreen({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container}>
-
       {/* Header */}
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <TouchableOpacity
@@ -61,7 +59,6 @@ export default function ReportScreen({ navigation, route }) {
         />
       </View>
 
-      
       {/* Sessions */}
       <View style={styles.mainCard}>
         <Text style={styles.heading}>Session History</Text>
@@ -73,12 +70,9 @@ export default function ReportScreen({ navigation, route }) {
         ) : (
           sessions.map(item => (
             <View key={item.sessionId} style={styles.sessionCard}>
-
               {/* Date + Menu */}
               <View style={styles.dateRow}>
-                <Text style={styles.date}>
-                  Date: {item.date ?? 'No Date'}
-                </Text>
+                <Text style={styles.date}>Date: {item.date ?? 'No Date'}</Text>
 
                 <TouchableOpacity
                   onPress={() =>
@@ -97,7 +91,6 @@ export default function ReportScreen({ navigation, route }) {
 
               {/* Metrics */}
               <View style={styles.metricsRow}>
-
                 {/* BP */}
                 <View style={styles.metricBox}>
                   <Image
@@ -129,17 +122,21 @@ export default function ReportScreen({ navigation, route }) {
                     style={styles.icon}
                   />
                   <Text style={styles.metricTitle}>HRV</Text>
-                  <Text style={styles.metricValue}>
-                    {item.sdnn ?? '--'}
-                  </Text>
+                  <Text style={styles.metricValue}>{item.sdnn ?? '--'}</Text>
                 </View>
               </View>
 
               {/* Stress */}
               <Text style={styles.stress}>
-                Stress Level: {item.stressLevel ?? 'Unknown'}
+                Overall Stress Level:{' '}
+                {item?.stressLevel == 0
+                  ? 'Low'
+                  : item?.stressLevel == 1
+                  ? 'Medium'
+                  : item?.stressLevel == 2
+                  ? 'High'
+                  : 'Unknown'}
               </Text>
-
             </View>
           ))
         )}
@@ -154,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-    paddingLeft: 15,  
+    paddingLeft: 15,
     paddingRight: 15,
   },
 
@@ -164,11 +161,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-
   backText: {
     color: 'white',
     fontSize: 16,
-
   },
 
   logo: {
@@ -195,7 +190,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 
-
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -214,9 +208,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-
- 
-  
 
   metricsRow: {
     flexDirection: 'row',

@@ -20,6 +20,7 @@ import {
   getEEGBeta,
   getEEGGamma,
   getSelfReport,
+  getPPGSingle,
 } from '../../../api/reportApi';
 
 const screenWidth = Dimensions.get('window').width;
@@ -29,6 +30,7 @@ export default function StudentQuestionReport({ navigation, route }) {
 
   const [question, setQuestion] = useState(null);
   const [eeg, setEeg] = useState({});
+  const [ppg, setPpg] = useState(null);
   const [loading, setLoading] = useState(true);
   const [graphLoading, setGraphLoading] = useState(true);
   const [selfReport, setSelfReport] = useState(null);
@@ -43,7 +45,6 @@ export default function StudentQuestionReport({ navigation, route }) {
       setQuestion(q);
       setLoading(false);
 
-      // 🔥 ADD THIS (SELF REPORT)
       const self = await getSelfReport(sessionId);
       setSelfReport(self);
 
@@ -54,6 +55,10 @@ export default function StudentQuestionReport({ navigation, route }) {
       const gamma = await getEEGGamma(sid, sessionId, qid);
 
       setEeg({ delta, theta, alpha, beta, gamma });
+
+      // 🔥 ADD THIS
+      const ppgData = await getPPGSingle(sid, sessionId, qid);
+      setPpg(ppgData);
     } catch (err) {
       console.log('Error:', err);
     } finally {
@@ -67,9 +72,9 @@ export default function StudentQuestionReport({ navigation, route }) {
 
     const values = data[label];
     const time = data.time;
-
-    const labels = time.map((t, i) => (i % 20 === 0 ? t.toString() : ''));
-
+    const labels = time.map((t, i) =>
+      i % 20 === 0 ? `${Math.round(t)}s` : '',
+    );
     return (
       <View style={{ marginBottom: 25 }}>
         <Text style={styles.chartTitle}>{label.toUpperCase()}</Text>
@@ -162,27 +167,76 @@ export default function StudentQuestionReport({ navigation, route }) {
 
       {/* STRESS */}
       <View style={styles.card}>
-        <Text style={styles.heading}>Overall Stress</Text>
+        <Text style={styles.heading}>Overall Question Report</Text>
 
-        <Text>Final Stress Level: {question?.stress_level || 'N/A'}</Text>
-        <Text>Complete time: {question?.time_taken || '0'} sec</Text>
+        <Text style={styles.subHeading}>Complete time</Text>
 
-        <Text style={styles.subHeading}>Blood Pressure (BP) Analysis</Text>
-        <Text>{question?.bp || 'N/A'}</Text>
+        <Text> {question?.time_taken || '0'} sec</Text>
+
+        <Text style={styles.subHeading}>Stress Index</Text>
+        <Text>
+          {question?.SI !== undefined && question?.SI !== null
+            ? question.SI.toFixed(3)
+            : 'N/A'}
+        </Text>
+
+        <Text style={styles.subHeading}>Blood Pressure </Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>Start Question (BP): </Text>
+          {question?.bpb ?? 'N/A'}
+        </Text>
+
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>End Question (BP): </Text>
+          {question?.bpa ?? 'N/A'}
+        </Text>
 
         <Text style={styles.subHeading}>Heart Rate Variability (PPG)</Text>
-        <Text>HR: {question?.HR ?? 'N/A'} BPM</Text>
-        <Text>RMSSD: {question?.RMSSD ?? 'N/A'} ms</Text>
-        <Text>SDNN: {question?.SDNN ?? 'N/A'} ms</Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>HR: </Text>
+          {question?.HR != null ? Math.round(question.HR) + ' bpm' : 'N/A'}
+        </Text>
 
-        <Text style={styles.subHeading}>Answer Details </Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>RMSSD: </Text>
+          {question?.RMSSD != null ? Math.round(question.RMSSD) + ' ms' : 'N/A'}
+        </Text>
 
-        <Text>Answers: {question?.Answers ?? 'N/A'} </Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>SDNN: </Text>
+          {question?.SDNN != null ? Math.round(question.SDNN) + ' ms' : 'N/A'}
+        </Text>
 
-        <Text>gptindex: {question?.gptindex === 1 ? 'Enable' : 'Disable'}</Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>pNN50: </Text>
+          {question?.pNN50 != null ? Math.round(question.pNN50) + ' %' : 'N/A'}
+        </Text>
+
+        <Text style={styles.subHeading}>Predicted Stress Level</Text>
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>Final Stress Level: </Text>
+          {question?.stress_level == 0
+            ? 'Low'
+            : question?.stress_level == 1
+            ? 'Medium'
+            : question?.stress_level == 2
+            ? 'High'
+            : 'N/A'}
+        </Text>
+
+        <Text style={styles.subHeading}>Answer </Text>
+
+        <Text>
+          <Text> </Text>
+          {question?.Answers ?? 'N/A'}
+        </Text>
+
+        <Text style={styles.subHeading}>ChatGPT Index </Text>
+        <Text> {question?.gptindex === 1 ? 'Used' : 'Not Used'}</Text>
 
         <Text style={styles.note}>
-          Higher RMSSD and SDNN indicate better relaxation.
+          Stress is indicated by higher heart rate, lower RMSSD/SDNN, and
+          increased EEG stress index (SI).
         </Text>
       </View>
 
@@ -204,6 +258,83 @@ export default function StudentQuestionReport({ navigation, route }) {
       </View>
 
       <View style={styles.card}>
+        <Text style={styles.heading}>PPG Graph (Heart Features)</Text>
+
+        {ppg?.HR?.length > 0 ? (
+          (() => {
+            const clean = arr =>
+              arr.map(v => (isNaN(v) || v === null ? 0 : Number(v)));
+
+            const time = ppg.time || [];
+            const hr = ppg.HR || [];
+            const sdnn = ppg.SDNN || [];
+            const rmssd = ppg.RMSSD || [];
+            const pnn50 = ppg.pNN50 || [];
+
+            const minLength = Math.min(
+              time.length,
+              hr.length,
+              sdnn.length,
+              rmssd.length,
+              pnn50.length,
+            );
+
+            const safeTime = time.slice(0, minLength);
+            const safeHR = clean(hr.slice(0, minLength));
+            const safeSDNN = clean(sdnn.slice(0, minLength));
+            const safeRMSSD = clean(rmssd.slice(0, minLength));
+            const safePNN50 = clean(pnn50.slice(0, minLength));
+
+            const reduce = arr => {
+              const step = Math.ceil(arr.length / 50);
+              return arr.filter((_, i) => i % step === 0);
+            };
+
+            const finalTime = reduce(safeTime);
+            const finalHR = reduce(safeHR);
+            const finalSDNN = reduce(safeSDNN);
+            const finalRMSSD = reduce(safeRMSSD);
+            const finalPNN50 = reduce(safePNN50);
+
+            const step = Math.ceil(finalTime.length / 8);
+
+            const labels = finalTime.map((t, i) =>
+              i % step === 0 ? `${Math.round(t)}s` : '',
+            );
+
+            return (
+              <LineChart
+                data={{
+                  labels: labels,
+                  datasets: [
+                    { data: finalHR, color: () => '#ff0000' },
+                    { data: finalSDNN, color: () => '#00bcd4' },
+                    { data: finalRMSSD, color: () => '#4caf50' },
+                    { data: finalPNN50, color: () => '#9c27b0' },
+                  ],
+                  legend: ['HR', 'SDNN', 'RMSSD', 'pNN50'],
+                }}
+                width={screenWidth - 60}
+                height={200}
+                withDots={false}
+                chartConfig={{
+                  backgroundGradientFrom: '#f9f9f9',
+                  backgroundGradientTo: '#f9f9f9',
+                  decimalPlaces: 2,
+                  color: () => '#000',
+                  labelColor: () => '#555',
+                }}
+                bezier
+                style={{ borderRadius: 10 }}
+              />
+            );
+          })()
+        ) : (
+          <Text style={styles.noData}>No PPG Data</Text>
+        )}
+      </View>
+
+      {/* <View style={styles.card}>
         <Text style={styles.heading}>Self Report (User Feedback)</Text>
 
         {selfReport ? (
@@ -218,12 +349,9 @@ export default function StudentQuestionReport({ navigation, route }) {
         ) : (
           <Text style={styles.noData}>No Self Report Data</Text>
         )}
-      </View>
+      </View> */}
 
-      <View style={{ marginTop: 10  , height: 50}} >
-        
-        
-      </View>
+      <View style={{ marginTop: 10, height: 50 }}></View>
     </ScrollView>
   );
 }
@@ -274,14 +402,17 @@ const styles = StyleSheet.create({
   },
 
   heading: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#48D1E4',
   },
 
   subHeading: {
     marginTop: 10,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#48D1E4',
   },
 
   chartTitle: {

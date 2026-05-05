@@ -70,20 +70,15 @@ export default function StudentSession({ navigation, route }) {
             {/* DATE + 3 DOT MENU */}
             <View style={styles.dateRow}>
               <Text style={styles.date}>Date: {item.date ?? 'No Date'}</Text>
-          
-              <TouchableOpacity
 
-              
+              <TouchableOpacity
                 onPress={() =>
                   navigation.navigate('StudentSessionReport', {
                     sessionId: item.sessionId,
                     studentId: student?.sid,
-                    
-                    
                   })
                 }
               >
-                
                 <Image
                   source={require('../../../../assets/icons/three-dot-menu.png')}
                   style={styles.menuIcon}
@@ -128,7 +123,14 @@ export default function StudentSession({ navigation, route }) {
             </View>
 
             <Text style={styles.stress}>
-              Overall Stress Level: {item.stressLevel ?? 'Unknown'}
+              Overall Stress Level:{' '}
+              {item?.stressLevel == 0
+                ? 'Low'
+                : item?.stressLevel == 1
+                ? 'Medium'
+                : item?.stressLevel == 2
+                ? 'High'
+                : 'Unknown'}
             </Text>
           </View>
         ))}
@@ -209,7 +211,6 @@ const styles = StyleSheet.create({
   },
 
   date: {
-  
     marginBottom: 8,
   },
 
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
 
   stress: {
     textAlign: 'center',
-    marginTop: 8 ,
+    marginTop: 8,
     fontSize: 12,
   },
 });

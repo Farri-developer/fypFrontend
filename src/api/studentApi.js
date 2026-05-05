@@ -1,7 +1,9 @@
-// api/studentApi.js
+// const BASE_URL = 'http://192.168.32.85:5000/api';
+const BASE_URL = 'http://192.168.32.86:5000/api';
 
-const BASE_URL = 'http://192.168.100.7:5000/api';
-// const BASE_URL = 'http://192.168.100.12:5000/api';
+
+
+
 
 // INSERT STUDENT
 export const registerStudent = async (studentData) => {
