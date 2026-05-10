@@ -1,7 +1,8 @@
 // api/Question api
 // const BASE_URL = 'http://192.168.32.85:5000/api';
-const BASE_URL = 'http://192.168.32.86:5000/api';
 
+
+const BASE_URL = 'http://192.168.100.7:5000/api';
 // GET ALL QUESTIONS
 
 export const getAllQuestions = async () => {

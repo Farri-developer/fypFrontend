@@ -116,6 +116,14 @@ export default function Report({ navigation, route }) {
           {report?.average_bpb ?? 'N/A'}
         </Text>
 
+
+        <Text>
+          <Text style={{ fontWeight: 'bold' }}>Mid  Question (BP): </Text>
+          {report?.average_bpm ?? 'N/A'}
+        </Text>
+
+
+
         <Text>
           <Text style={{ fontWeight: 'bold' }}>End Question (BP): </Text>
           {report?.average_bpa ?? 'N/A'}
@@ -253,7 +261,7 @@ export default function Report({ navigation, route }) {
 
         {/* 🔥 PPG GRAPH */}
         <View style={styles.card}>
-          <Text style={styles.heading}>PPG Graph (Heart Features)</Text>
+          <Text style={ [styles.heading , { marginLeft: -30 }] }>PPG Graph (Heart Features)</Text>
 
           {ppg?.HR?.length > 0 ? (
             (() => {
@@ -313,6 +321,7 @@ export default function Report({ navigation, route }) {
                   }}
                   width={screenWidth - 40}
                   height={260}
+                 
                   withDots={false}
                   chartConfig={{
                     backgroundColor: '#fff',
@@ -323,7 +332,7 @@ export default function Report({ navigation, route }) {
                     labelColor: () => '#000',
                   }}
                   bezier={false}
-                  style={{ borderRadius: 10, marginTop: 10 }}
+                  style={{ borderRadius: 10, marginTop: 10 , marginLeft: -50 }}
                 />
               );
             })()

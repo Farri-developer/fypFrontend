@@ -8,39 +8,60 @@ import {
   Image,
   ActivityIndicator,
   Switch,
+  Modal,
 } from 'react-native';
 
-import { stopRecording, resetAll } from '../../../api/sessionApi';
+import { stopRecording, resetAll, midQuestionBP } from '../../../api/sessionApi';
 import { deleteSession } from '../../../api/reportApi';
-
 
 export default function QuestionAttempt({ route, navigation }) {
   const params = route?.params || {};
   const sessionid = params.sessionid || null;
   const currentQuestion = params.questions[0] || null;
   const remainingQuestions = params.questions.slice(1) || [];
-
   const sid = params.sid || null;
 
-  const [seconds, setSeconds] = useState((currentQuestion?.duration || 1) * 60);
+  const totalSeconds = (currentQuestion?.duration || 1) * 60;
 
+  const [seconds, setSeconds] = useState(totalSeconds);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [chatgptEnabled, setChatgptEnabled] = useState(false);
 
+  // =====================
+  // MID BP POPUP STATE
+  // =====================
+  const [showMidPopup, setShowMidPopup] = useState(false);
+  const [midBpLoading, setMidBpLoading] = useState(false);
+  const [midBpError, setMidBpError] = useState(false);   // ✅ error state
+  const midPopupShown = useRef(false);
+
   const hasNavigated = useRef(false);
 
-  // ✅ TIMER
+  // =====================
+  // TIMER
+  // =====================
   useEffect(() => {
     if (seconds <= 0) return;
 
     const timer = setInterval(() => {
       setSeconds(prev => {
-        if (prev === 1 && !hasNavigated.current) {
+        const newVal = prev - 1;
+
+        // 1 minute baad popup dikhao - sirf ek baar
+        const midPoint = totalSeconds - 60;
+        if (newVal === midPoint && !midPopupShown.current) {
+          midPopupShown.current = true;
+          setShowMidPopup(true);
+        }
+
+        // Timer khatam - next screen
+        if (newVal === 0 && !hasNavigated.current) {
           hasNavigated.current = true;
           setTimeout(() => handleNext(), 0);
         }
-        return prev - 1;
+
+        return newVal;
       });
     }, 1000);
 
@@ -53,10 +74,39 @@ export default function QuestionAttempt({ route, navigation }) {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // ✅ NEXT → GO TO END BP WITH REMAINING QUESTIONS
+  // =====================
+  // MID BP OK BUTTON
+  // =====================
+  const handleMidBpOk = async () => {
+    setMidBpLoading(true);
+    setMidBpError(false); // ✅ pehle error clear karo
+
+    try {
+      const result = await midQuestionBP();
+
+      // ✅ SIRF is condition pe popup band hoga
+      if (result?.status === 'mid question BP saved') {
+        setShowMidPopup(false);
+        console.log('✅ Mid BP saved successfully');
+      } else {
+        // Unexpected response - popup khula raho
+        console.log('⚠️ Unexpected response:', result);
+        setMidBpError(true);
+      }
+    } catch (error) {
+      // Network error / device disconnect - popup khula raho
+      console.log('❌ Mid BP Error:', error);
+      setMidBpError(true);
+    } finally {
+      setMidBpLoading(false); // loading band karo (chahe success ho ya error)
+    }
+  };
+
+  // =====================
+  // SUBMIT / NEXT
+  // =====================
   const handleNext = async () => {
     if (loading || hasNavigated.current) return;
-
     hasNavigated.current = true;
 
     try {
@@ -83,37 +133,83 @@ export default function QuestionAttempt({ route, navigation }) {
     }
   };
 
+  // =====================
+  // BACK
+  // =====================
   const handleBack = async () => {
-  try {
-    console.log('⬅️ Back pressed - stopping stream');
+    try {
+      if (sessionid) {
+        await deleteSession(sessionid);
+        console.log('🗑 Session Deleted');
+      }
+      await resetAll();
 
-    // 🗑 DELETE SESSION
-    if (sessionid) {
-      await deleteSession(sessionid);
-      console.log('🗑 Session Deleted');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'StudentTabs', params: { sid: sid } }],
+      });
+    } catch (error) {
+      console.log('BACK ERROR:', error);
     }
+  };
 
-    // ♻ RESET SYSTEM
-    await resetAll();
-
-    // 🔥 STACK RESET + NAVIGATE
-    navigation.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'StudentTabs',
-          params: { sid: sid },
-        },
-      ],
-    });
-
-  } catch (error) {
-    console.log('BACK ERROR:', error);
-  }
-};
-
+  // =====================
+  // RENDER
+  // =====================
   return (
     <View style={styles.container}>
+
+      {/* ========================
+          MID BP POPUP
+      ======================== */}
+      <Modal
+        visible={showMidPopup}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+
+            {/* Icon */}
+            <Text style={styles.modalIcon}>🩺</Text>
+
+            {/* Title */}
+            <Text style={styles.modalTitle}>Blood Pressure Check</Text>
+
+            {/* Message */}
+            <Text style={styles.modalMessage}>
+              Please turn ON your BP device and press OK when ready.
+            </Text>
+
+            {/* ✅ Error message - sirf tab dikhao jab error ho */}
+            {midBpError && (
+              <Text style={styles.modalErrorText}>
+                ⚠️ Device disconnected or failed. Please reconnect and try again.
+              </Text>
+            )}
+
+            {/* OK / Retry Button */}
+            <TouchableOpacity
+              style={[styles.modalBtn, midBpLoading && styles.modalBtnDisabled]}
+              onPress={handleMidBpOk}
+              disabled={midBpLoading}
+            >
+              {midBpLoading ? (
+                <View style={styles.modalBtnRow}>
+                  <ActivityIndicator color="#fff" size="small" />
+                  <Text style={styles.modalBtnText}>  Reading BP...</Text>
+                </View>
+              ) : (
+                <Text style={styles.modalBtnText}>
+                  {midBpError ? '🔄 Retry' : "OK - I'm Ready"}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+          </View>
+        </View>
+      </Modal>
+
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
@@ -130,7 +226,6 @@ export default function QuestionAttempt({ route, navigation }) {
       <View style={styles.card}>
         <View style={styles.topBox}>
           <Text style={styles.qTitle}>Question Attempt</Text>
-
           <View style={styles.timerBox}>
             <Text style={styles.timerText}>⏱ {formatTime()}</Text>
           </View>
@@ -140,10 +235,6 @@ export default function QuestionAttempt({ route, navigation }) {
         <Text style={styles.question}>
           {currentQuestion?.description || 'No Question'}
         </Text>
-{/* 
-        <Text style={styles.question}>
-          {currentQuestion?.qid || 'No Question'}
-        </Text> */}
 
         <View style={styles.gptRow}>
           <Text style={styles.gptText}>ChatGPT</Text>
@@ -156,7 +247,6 @@ export default function QuestionAttempt({ route, navigation }) {
           style={styles.input}
           placeholder="Enter your program..."
           placeholderTextColor="#999"
-
           multiline
           value={answer}
           onChangeText={setAnswer}
@@ -180,12 +270,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#48D1E4',
-   
   },
 
   header: {
     flexDirection: 'row',
-    
   },
 
   back: {
@@ -198,7 +286,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     resizeMode: 'contain',
-    marginLeft: '63',
+    marginLeft: '17%',
   },
 
   card: {
@@ -265,7 +353,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     height: 120,
-    textAlignVertical: 'top', // ✅ better UX
+    textAlignVertical: 'top',
   },
 
   nextBtn: {
@@ -286,5 +374,78 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: 'center',
     color: 'gray',
+  },
+
+  // ========================
+  // MODAL STYLES
+  // ========================
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 28,
+    width: '80%',
+    alignItems: 'center',
+    elevation: 10,
+  },
+
+  modalIcon: {
+    fontSize: 40,
+    marginBottom: 10,
+  },
+
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#48D1E4',
+    marginBottom: 10,
+  },
+
+  modalMessage: {
+    fontSize: 14,
+    color: '#444',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+
+  // ✅ Error message style
+  modalErrorText: {
+    fontSize: 12,
+    color: '#e53935',
+    textAlign: 'center',
+    marginBottom: 14,
+    lineHeight: 18,
+    paddingHorizontal: 10,
+  },
+
+  modalBtn: {
+    backgroundColor: '#48D1E4',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    minWidth: 160,
+    alignItems: 'center',
+  },
+
+  modalBtnDisabled: {
+    backgroundColor: '#90dce8',
+  },
+
+  modalBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  modalBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
