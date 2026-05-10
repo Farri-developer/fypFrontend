@@ -315,3 +315,78 @@ export const getPPGSingle = async (sid, sessionId, qid) => {
     return null;
   }
 };
+
+
+
+
+// ======================================================
+// 👉 BP REPORT API CALL
+// ======================================================
+
+export const getBPReport = async (sid, sessionId) => {
+
+  try {
+
+    const response = await fetch(
+      `${BASE_URL}/devices/eeg/bp-report?sessionid=${sessionId}&sid=${sid}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+      console.log("BP REPORT ERROR:", data);
+      return null;
+
+    }
+
+    console.log("BP REPORT:", data);
+
+    return data;
+
+  } catch (error) {
+
+    console.log("BP REPORT API ERROR:", error);
+
+    return null;
+
+  }
+
+};
+
+
+// ======================================================
+// 👉 COMBINED QUESTION REPORT API CALL
+// ======================================================
+
+export const getCombinedQuestionReport = async (sid, sessionId) => {
+
+  try {
+
+    const response = await fetch(
+      `${BASE_URL}/devices/eeg/combined-question-report?sessionid=${sessionId}&sid=${sid}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+
+      console.log("COMBINED REPORT ERROR:", data);
+
+      return null;
+
+    }
+
+    console.log("COMBINED QUESTION REPORT:", data);
+
+    return data;
+
+  } catch (error) {
+
+    console.log("COMBINED QUESTION REPORT ERROR:", error);
+
+    return null;
+
+  }
+
+};
