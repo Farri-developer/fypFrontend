@@ -1,7 +1,7 @@
 // const BASE_URL = 'http://192.168.32.85:5000/api';
 
 
-const BASE_URL = 'http://192.168.100.7:5000/api';
+const BASE_URL ='http://192.168.18.30:5000/api';
 
 export const startSession = async () => {
   try {

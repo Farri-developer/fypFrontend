@@ -126,6 +126,11 @@ export default function StudentSessionReport({ navigation, route }) {
         </Text>
 
         <Text>
+          <Text style={{ fontWeight: 'bold' }}>Middle Question (BP): </Text>
+          {report?.average_bpm || '-'}
+        </Text>
+
+        <Text>
           <Text style={{ fontWeight: 'bold' }}>End Question (BP): </Text>
           {report?.average_bpa || '-'}
         </Text>
@@ -352,7 +357,7 @@ export default function StudentSessionReport({ navigation, route }) {
       </View>
 
       {/* Self Report */}
-      <View style={styles.card}>
+      {/* <View style={styles.card}>
         <Text style={styles.heading}>Self Report (User Feedback)</Text>
 
         {selfReport ? (
@@ -367,7 +372,7 @@ export default function StudentSessionReport({ navigation, route }) {
         ) : (
           <Text style={styles.noData}>No Self Report Data</Text>
         )}
-      </View>
+      </View>  */}
 
       {/* QUESTIONS */}
       <View style={styles.reportSection}>

@@ -49,7 +49,7 @@ export default function QuestionAttempt({ route, navigation }) {
         const newVal = prev - 1;
 
         // 1 minute baad popup dikhao - sirf ek baar
-        const midPoint = totalSeconds - 60;
+        const midPoint = totalSeconds - 300;
         if (newVal === midPoint && !midPopupShown.current) {
           midPopupShown.current = true;
           setShowMidPopup(true);

@@ -17,6 +17,7 @@ import {
   getStudentSessionReport,
   getEEGData,
   getPPGAll,
+  getSelfReport,
 } from '../../../api/reportApi';
 
 export default function Report({ navigation, route }) {
@@ -28,6 +29,7 @@ export default function Report({ navigation, route }) {
 
   const [loading, setLoading] = useState(true); // main data
   const [graphLoading, setGraphLoading] = useState(true); // graph
+  const [selfReport, setSelfReport] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -39,6 +41,10 @@ export default function Report({ navigation, route }) {
       const res = await getStudentSessionReport(studentId, sessionId);
       setReport(res);
       setLoading(false); // screen show
+
+
+        const self = await getSelfReport(sessionId);
+            setSelfReport(self);
 
       // ✅ STEP 2: GRAPH LOAD (slow)
       const eegData = await getEEGData(studentId, sessionId);
@@ -374,7 +380,32 @@ export default function Report({ navigation, route }) {
         ) : (
           <Text style={styles.noData}>No Data Exist</Text>
         )}
+
+   
+
+
+
       </View>
+
+
+      {/* Self Report */}
+      {/* <View style={styles.card}>
+        <Text style={styles.heading}>Self Report (User Feedback)</Text>
+
+        {selfReport ? (
+          <>
+            <Text>Mental Load: {selfReport.mentalLoad}</Text>
+            <Text>Frustration: {selfReport.frustration}</Text>
+            <Text>Effort: {selfReport.effort}</Text>
+
+            <Text style={styles.subHeading}>Comment</Text>
+            <Text>{selfReport.comment || 'No comment'}</Text>
+          </>
+        ) : (
+          <Text style={styles.noData}>No Self Report Data</Text>
+        )}
+      </View> */}
+
     </ScrollView>
   );
 }
